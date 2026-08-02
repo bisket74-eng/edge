@@ -1314,8 +1314,11 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 
 /* Gameplay repair: no sticky Trade Piles title, and reliable chooser swipes on Android. */
 .trade-collection-slide .collection-menu-title{display:none!important}
-.action-choice-track{touch-action:pan-y pinch-zoom!important}
-.action-choice-slide{touch-action:pan-y!important}
+.action-choice-track{
+  touch-action:pan-x pan-y pinch-zoom!important;
+  -webkit-overflow-scrolling:touch;
+}
+.action-choice-slide{touch-action:pan-x pan-y!important}
 
 </style>
 </head>
@@ -1453,8 +1456,8 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 (() => {
 "use strict";
 
-const EDGE_BUILD = "2026.08.01-2348";
-const EDGE_BUILD_LABEL = "Build 8/2 • 3:18 PM • Action + Swipe Fix";
+const EDGE_BUILD = "2026.08.02-1600";
+const EDGE_BUILD_LABEL = "Build 8/2 • 4:12 PM • Scenario Deck Fix";
 async function clearLegacyEdgeCaches(){
   try{
     const previous=localStorage.getItem("edge_active_build");
@@ -5842,11 +5845,36 @@ const SCENARIO2_MAIN_ADDITIONS = ["ammunition","kevlar-vest","venture","under-fi
 const SCENARIO2_SURVIVOR_ADDITIONS = ["marine","medic"];
 const SCENARIO3_MAIN_ADDITIONS = ["armed-robbery"];
 const SCENARIO3_SURVIVOR_ADDITIONS = ["scavenger","hitman"];
-const SCENARIO_EVENT_IDS = {
-  1:{plot:["s1-thieves","s1-dangerous-gamble","s1-going-crazy","s1-tough-call","s1-depleting-resources","s1-they-come-at-night"],location:["s1-savagery","s1-desperation","s1-allies-and-foes","s1-wrong-turn","s1-surprise-attack","s1-new-world-order"]},
-  2:{plot:["s2-drought","s2-end-road","s2-scavengers","s2-turf-wars","s2-raiders","s2-no-honor"],location:["s2-mutants","s2-uncharted-mines","s2-radiation-spike","s2-mutant-attack","s2-scrap-metal","s2-old-cellar"]},
-  3:{plot:["s3-starting-over","s3-top-dog","s3-mexican-standoff","s3-good-life","s3-mcdonalds-farm","s3-scare-tactics"],location:["s3-abduction-protocol","s3-crop-circles","s3-crash-site","s3-empty-cradles","s3-town-square","s3-flying-saucer"]}
+const SCENARIO_EVENT_LETTERS = {
+  1:["A","B"],
+  2:["C","D"],
+  3:["E","F"]
 };
+
+function scenarioEventSets(scenario){
+  scenario=Math.max(1,Math.min(3,Number(scenario)||1));
+  const letters=SCENARIO_EVENT_LETTERS[scenario];
+  const sets=letters.map(letter=>Object.entries(CARD_DEFS)
+    .filter(([,card])=>card.type==="event" && String(card.code||"").toUpperCase().startsWith(letter))
+    .sort((a,b)=>Number(String(a[1].code).slice(1))-Number(String(b[1].code).slice(1)))
+    .map(([id])=>id));
+
+  sets.forEach((ids,index)=>{
+    const letter=letters[index];
+    const codes=ids.map(id=>String(CARD_DEFS[id]?.code||"").toUpperCase());
+    const expected=Array.from({length:6},(_,i)=>`${letter}${i+1}`);
+    if(ids.length!==6 || expected.some(code=>!codes.includes(code))){
+      throw new Error(`Scenario ${scenario} Event set ${letter} is incomplete or mixed.`);
+    }
+  });
+  return sets;
+}
+
+function eventBelongsToScenario(cardOrInst,scenario){
+  const def=cardOrInst?.defId ? defOf(cardOrInst) : cardOrInst;
+  const letter=String(def?.code||"").charAt(0).toUpperCase();
+  return (SCENARIO_EVENT_LETTERS[Number(scenario)]||SCENARIO_EVENT_LETTERS[1]).includes(letter);
+}
 const SCENARIO_NAMES={1:"Epidemic — New York",2:"Nuclear Aftermath — New Mexico",3:"Alien Invasion — Nebraska"};
 
 const app = {
@@ -5921,6 +5949,21 @@ function effectiveRecruitCost(p,d,extraDiscount=0){return Math.max(0,Number(d.co
 function logLine(state,text){state.log.unshift({id:uid(),text,ts:Date.now()});state.log=state.log.slice(0,200)}
 function seatOrder(state){const out=[];for(let i=0;i<state.players.length;i++)out.push((state.firstSeat+i)%state.players.length);return out}
 function activePlayer(state){return state.players[state.activeSeat]||null}
+function roundStarter(state){
+  if(!state?.players?.length)return null;
+  const crowned=state.crownPlayerId?state.players.find(p=>p.id===state.crownPlayerId):null;
+  return crowned||state.players[state.firstSeat]||state.players[0]||null;
+}
+function roundStarterSeat(state){
+  const starter=roundStarter(state);
+  if(!starter)return 0;
+  const index=state.players.findIndex(p=>p.id===starter.id);
+  return index>=0?index:Math.max(0,Number(state.firstSeat)||0);
+}
+function canStartRound(state,playerId=app.id){
+  const starter=roundStarter(state);
+  return !!starter&&starter.id===playerId;
+}
 function allColonyCards(p){return [...(p.survivors||[]),...(p.buildings||[]),...(p.equipment||[])]}
 function weaponCards(p){return allColonyCards(p).filter(inst=>defOf(inst)?.weapon)}
 function loadedWeapons(p){return weaponCards(p).filter(inst=>Number(inst.bullets||0)>0)}
@@ -5963,10 +6006,22 @@ function buildScenarioSurvivorIds(scenario){
   return ids;
 }
 function buildScenarioEventIds(scenario){
-  const set=SCENARIO_EVENT_IDS[scenario]||SCENARIO_EVENT_IDS[1];
-  const plot=shuffle(set.plot).slice(1);
-  const location=shuffle(set.location).slice(1);
-  return shuffle([...plot,...location]).slice(1);
+  scenario=Math.max(1,Math.min(3,Number(scenario)||1));
+  const [firstSet,secondSet]=scenarioEventSets(scenario);
+
+  // Rulebook setup: remove one unseen card from each six-card set.
+  const firstFive=shuffle(firstSet).slice(1);
+  const secondFive=shuffle(secondSet).slice(1);
+
+  // Shuffle the remaining ten together, remove one more unseen card,
+  // and use the final nine cards as the Event deck.
+  const tenCards=shuffle([...firstFive,...secondFive]);
+  const finalNine=tenCards.slice(1);
+
+  if(finalNine.length!==9 || finalNine.some(id=>!eventBelongsToScenario(CARD_DEFS[id],scenario))){
+    throw new Error(`Scenario ${scenario} Event deck failed validation.`);
+  }
+  return finalNine;
 }
 function drawFromMain(state){
   if(!state.tradeDeck.length&&state.waste.length){state.tradeDeck=shuffle(state.waste.splice(0));logLine(state,"The Waste pile was shuffled into a new Main deck.")}
@@ -6044,12 +6099,13 @@ function makePlayer(info,seat,scenario){
 function createGame(playerInfos,scenario=app.scenario||1){
   scenario=Math.max(1,Math.min(3,Number(scenario)||1));
   const eventIds=buildScenarioEventIds(scenario);
-  const state={version:5,token:uid(),scenario,scenarioName:SCENARIO_NAMES[scenario],round:1,maxRounds:eventIds.length,targetSP:11,phase:"round-ready",phaseStep:"ready",firstSeat:0,activeSeat:0,event:null,
+  const state={version:5,token:uid(),scenario,scenarioName:SCENARIO_NAMES[scenario],round:1,maxRounds:eventIds.length,targetSP:11,phase:"round-ready",phaseStep:"ready",firstSeat:0,activeSeat:0,crownPlayerId:null,event:null,
     players:playerInfos.map((x,i)=>makePlayer(x,i,scenario)),tradeDeck:makeDeck(buildScenarioMainIds(scenario)),survivorDeck:makeDeck(buildScenarioSurvivorIds(scenario)),eventDeck:eventIds.map(makeInst),
     market:[],survivorRow:[],survivorWaste:[],unluckyUid:null,waste:[],tradeOrder:[],tradePickIndex:0,tradePenalty:0,winnerIds:[],log:[],updatedAt:Date.now(),
     roundTrashSupplyDamage:0,roundHandPenalty:0,eventActionStartZero:false,roundActionBonus:0,townSquare:false,eventChoices:{},actionChoice:null};
+  state.crownPlayerId=state.players[0]?.id||null;
   state.players.forEach(p=>drawCards(state,p,5));
-  refillSurvivors(state);markUnlucky(state);refillMarket(state);logLine(state,`${state.scenarioName} is ready. The host will start Round 1.`);return state;
+  refillSurvivors(state);markUnlucky(state);refillMarket(state);logLine(state,`${state.scenarioName} is ready. ${roundStarter(state)?.name||"The crowned first player"} has the crown and will start Round 1.`);return state;
 }
 function damage(state,p,amount,reason=""){
   amount=Math.max(0,Number(amount)||0);
@@ -6086,8 +6142,11 @@ function usePostmanAbility(state,p){
   cards.sort((a,b)=>(Number(defOf(b).trade||0)+Number(defOf(b).value||0)+Number(defOf(b).sp||0))-(Number(defOf(a).trade||0)+Number(defOf(a).value||0)+Number(defOf(a).sp||0)));
   const kept=cards.shift();p.hand.push(kept);p.discard.push(...cards);logLine(state,`${p.name} used Postman, kept ${defOf(kept).title}, and discarded ${cards.length} card${cards.length===1?"":"s"}.`);return true
 }
+function hitmanTargets(state,p){
+  const targets=[];state.players.filter(x=>x.id!==p.id).forEach(owner=>owner.survivors.forEach(card=>targets.push({owner,card})));return targets;
+}
 function bestHitmanTarget(state,p){
-  let best=null;state.players.filter(x=>x.id!==p.id).forEach(owner=>owner.survivors.forEach(card=>{const score=Number(defOf(card).sp||0)+Number(defOf(card).cost||0)/10;if(!best||score>best.score)best={owner,card,score}}));return best
+  let best=null;hitmanTargets(state,p).forEach(({owner,card})=>{const score=Number(defOf(card).sp||0)+Number(defOf(card).cost||0)/10;if(!best||score>best.score)best={owner,card,score}});return best
 }
 function useHitmanAbility(state,p,targetPlayerId,targetUid){
   const hitman=p.survivors.find(c=>c.defId==="hitman");if(!hitman)return false;
@@ -6373,12 +6432,23 @@ function applyEvent(state,inst){
 }
 function startRound(state){
   if(!state||state.phase!=="round-ready")return false;
+  const starterSeat=roundStarterSeat(state);
+  state.firstSeat=starterSeat;
+  state.activeSeat=starterSeat;
+  state.crownPlayerId=state.players[starterSeat]?.id||state.crownPlayerId||null;
   revealEvent(state);
   logLine(state,`Round ${state.round} started. Everyone has 20 seconds to read the Event.`);
   return true;
 }
 function revealEvent(state){
   resetRoundEventFlags(state);
+
+  // Defensive guard for rooms created by an older build: never reveal an
+  // Event whose A/B, C/D, or E/F code does not match the chosen scenario.
+  while(state.eventDeck.length && !eventBelongsToScenario(state.eventDeck[0],state.scenario)){
+    const rejected=state.eventDeck.shift();
+    logLine(state,`Removed a mismatched Event (${defOf(rejected)?.code||"unknown"}) from this Scenario.`);
+  }
   state.event=state.eventDeck.shift()||null;
   state.phase="event";
   state.phaseStep="reveal";
@@ -6421,6 +6491,12 @@ function refundAction(p){
   p.actionsSpent=Math.max(0,Number(p.actionsSpent||0)-1);return syncActionPool(p);
 }
 function endActionPool(p){p.actionsSpent=Math.max(Number(p.actionsSpent||0),Number(p.actionsStarted||0)+Number(p.actionsGranted||0));return syncActionPool(p)}
+function validateActionPool(state,p,context="Action"){
+  const before=Number(p.actionsLeft||0),after=syncActionPool(p);
+  if(!Number.isFinite(after)||after<0){p.actionsStarted=0;p.actionsGranted=0;p.actionsSpent=0;p.actionsLeft=0;logLine(state,`${p.name}'s Action counter was safely reset after ${context}.`);return 0}
+  if(before!==after)p.actionsLeft=after;
+  return after;
+}
 function beginActionPhase(state){
   if(hasPendingEventChoices(state))return false;
   state.phase="action";state.phaseStep="turn";state.players.forEach(p=>{p.actionDone=false;p.currentActionTitle="";p.lastActionTitle="";p.roundBidBoost=0;const starting=state.eventActionStartZero?0:Math.max(0,1+hasOngoing(p,"extraActions")+Number(state.roundActionBonus||0)+Number(p.eventActionDelta||0));resetActionPool(p,starting);p.eventActionDelta=0;
@@ -6432,7 +6508,7 @@ function advanceActionTurn(state){
   for(let step=1;step<=order.length;step++){const seat=order[(currentIndex+step)%order.length];if(!state.players[seat].actionDone){state.activeSeat=seat;return}}
   startTrade(state);
 }
-function afterActionSpent(state,p){syncActionPool(p);if(p.actionsLeft<=0){if(state.eventActionStartZero&&p.health>0)return;advanceActionTurn(state)}}
+function afterActionSpent(state,p){validateActionPool(state,p,p.lastActionTitle||p.currentActionTitle||"Action");if(p.actionsLeft<=0){if(state.eventActionStartZero&&p.health>0)return;advanceActionTurn(state)}}
 function startTrade(state){state.phase="trade";state.phaseStep="bid";state.activeSeat=state.firstSeat;state.tradeOrder=[];state.tradePickIndex=0;state.players.forEach(p=>{p.bidSubmitted=false;p.bidUids=[];p.bidValue=0});logLine(state,"The Trade phase began.")}
 function calculateBid(state,p,uids){const valid=p.hand.filter(c=>uids.includes(c.uid)&&Number(defOf(c).trade||0)>0);return Math.max(0,valid.reduce((n,c)=>n+Number(defOf(c).trade||0),0)+tradeBonus(p)-Number(state.tradePenalty||0))}
 function resolveBids(state){
@@ -6461,7 +6537,7 @@ function cleanupRound(state){
   state.players.forEach(p=>{storeJanitorActions(state,p);allColonyCards(p).forEach(inst=>{if(ongoingEntries(inst).some(x=>x.kind==="autoReload"))inst.bullets=Math.max(inst.bullets||0,1)});const unloaded=weaponCards(p).some(w=>Number(w.bullets||0)<Number(defOf(w).maxBullets||1));if(unloaded){const supply=p.hand.find(c=>defOf(c)?.type==="supply");if(supply){p.discard.push(removeByUid(p.hand,supply.uid));reloadAllWeapons(p);logLine(state,`${p.name} discarded a Supply card to reload all Weapons.`)}}p.roundBidBoost=0;p.eventBidBoost=0;p.usedMedic=false});
   const reached=state.players.some(p=>p.sp>=state.targetSP),eventsDone=state.eventDeck.length===0;if(reached||eventsDone){endGame(state);return}
   state.players.forEach(p=>{if(p.health<=0){p.health=7;logLine(state,`${p.name}'s empty Life pool was refilled to 7.`)}refillHand(state,p)});
-  state.round++;state.firstSeat=(state.firstSeat+1)%state.players.length;state.activeSeat=state.firstSeat;state.phase="round-ready";state.phaseStep="ready";state.event=null;resetRoundEventFlags(state);logLine(state,`Round ${state.round} is ready. Waiting for the host to start it.`)
+  state.round++;state.firstSeat=(roundStarterSeat(state)+1)%state.players.length;state.activeSeat=state.firstSeat;state.crownPlayerId=state.players[state.firstSeat]?.id||null;state.phase="round-ready";state.phaseStep="ready";state.event=null;resetRoundEventFlags(state);logLine(state,`Round ${state.round} is ready. ${roundStarter(state)?.name||"The crowned first player"} has the crown and will start it.`)
 }
 function endGame(state){
   state.phase="gameover";state.phaseStep="done";state.players.forEach(p=>{let bonus=0;p.survivors.forEach(inst=>{const eg=defOf(inst)?.endGame;if(eg?.kind==="perSurvivor")bonus+=p.survivors.filter(x=>x.defId===eg.target).length*Number(eg.amount||0)});if(bonus){p.sp+=bonus;logLine(state,`${p.name} gained ${bonus} end-game SP.`)}});
@@ -6469,8 +6545,12 @@ function endGame(state){
 }
 
 function beginActionChoice(state,p,card,kind,extra={}){
-  state.actionChoice={id:uid(),playerId:p.id,kind,card,sourceUid:card?.uid||"",sourceDefId:card?.defId||"",stage:extra.stage||"choose",cards:extra.cards||[],destination:extra.destination||"discard",filter:extra.filter||"",title:defOf(card)?.title||"Action Card"};
-  logLine(state,`${p.name} must finish resolving ${defOf(card)?.title||"an Action card"}.`);
+  const title=extra.title||defOf(card)?.title||"Action Card";
+  // A new chooser must completely replace the previous one. This prevents
+  // Scouting/Hospitable/etc. from reappearing after a later Action is played.
+  state.actionChoice={id:uid(),playerId:p.id,kind,card,sourceUid:card?.uid||"",sourceDefId:card?.defId||"",stage:extra.stage||"choose",cards:extra.cards||[],destination:extra.destination||"discard",filter:extra.filter||"",title,openedAt:Date.now(),actionsBeforeChoice:syncActionPool(p)};
+  if(p.id===app.id){app.ui.actionDecisionCardUid=null;app.ui.actionDecisionChoiceId=state.actionChoice.id;app.ui.actionChoiceSuppressUntil=0}
+  logLine(state,`${p.name} must finish resolving ${title}.`);
   return {pending:true};
 }
 function actionChoiceCards(state,p,choice){
@@ -6479,8 +6559,9 @@ function actionChoiceCards(state,p,choice){
     return state.market.flat().filter(card=>choice.filter!=="supply"||defOf(card)?.type==="supply");
   }
   if(choice.kind==="survivor-row")return state.survivorRow.slice();
-  if(choice.kind==="scouting-pick")return (choice.cards||[]).slice();
-  if(choice.kind==="scouting-cost")return p.hand.filter(card=>defOf(card)?.type==="supply");
+  if(choice.kind==="scouting-pick"||choice.kind==="postman-pick")return (choice.cards||[]).slice();
+  if(choice.kind==="scouting-cost"||choice.kind==="medic-supply")return p.hand.filter(card=>defOf(card)?.type==="supply");
+  if(choice.kind==="hitman-target")return hitmanTargets(state,p).map(item=>item.card);
   if(choice.kind==="heroic-recruit")return p.hand.filter(card=>defOf(card)?.type==="survivor"&&effectiveRecruitCost(p,defOf(card))<=2);
   if(choice.kind==="discard-one")return p.hand.slice();
   if(choice.kind==="building-plans")return p.projects.filter(project=>Number(project.progress||0)>=Math.ceil(Number(project.cost||0)/2)).map(project=>project.card);
@@ -6515,6 +6596,19 @@ function resolveActionChoice(state,p,cardUid,option="select"){
   const choice=state.actionChoice;if(!choice||choice.playerId!==p.id)return false;
   const chosen=cardUid?actionChoiceCards(state,p,choice).find(card=>card.uid===cardUid):null;
   switch(choice.kind){
+    case"medic-supply":{
+      if(!chosen||p.usedMedic||p.health>=7)return false;const supply=removeByUid(p.hand,chosen.uid);if(!supply)return false;
+      p.discard.push(supply);p.usedMedic=true;heal(state,p,2);state.actionChoice=null;
+      if(p.id===app.id){app.ui.actionDecisionCardUid=null;app.ui.actionDecisionChoiceId=null}
+      p.currentActionTitle="";p.lastActionTitle="Medic";logLine(state,`${p.name}'s Medic used ${defOf(supply).title} and restored 2 Life.`);return true;
+    }
+    case"hitman-target":{
+      if(!chosen)return false;const targetOwner=state.players.find(owner=>owner.id!==p.id&&owner.survivors.some(card=>card.uid===chosen.uid));if(!targetOwner)return false;
+      const hitman=p.survivors.find(card=>card.defId==="hitman"),target=targetOwner.survivors.find(card=>card.uid===chosen.uid);if(!hitman||!target)return false;
+      p.discard.push(removeByUid(p.survivors,hitman.uid));targetOwner.discard.push(removeByUid(targetOwner.survivors,target.uid));releaseOrphanedStoredActions(state,targetOwner);state.actionChoice=null;
+      if(p.id===app.id){app.ui.actionDecisionCardUid=null;app.ui.actionDecisionChoiceId=null}
+      p.currentActionTitle="";p.lastActionTitle="Hitman";logLine(state,`${p.name}'s Hitman removed ${defOf(target).title} from ${targetOwner.name}'s Colony.`);return true;
+    }
     case"trade-card":
       if(!chosen||!takeMarketCardByUid(state,p,chosen.uid,choice.destination,choice.filter==="supply"))return false;
       return finishPlayedActionCard(state,p,choice);
@@ -6522,6 +6616,15 @@ function resolveActionChoice(state,p,cardUid,option="select"){
       if(!chosen)return false;const index=state.survivorRow.findIndex(card=>card.uid===chosen.uid);if(index<0)return false;
       const card=state.survivorRow.splice(index,1)[0];if(card.uid===state.unluckyUid)state.unluckyUid=null;p.discard.push(card);
       logLine(state,`${p.name} chose ${defOf(card).title} from the Survivor Row.`);return finishPlayedActionCard(state,p,choice);
+    }
+    case"postman-pick":{
+      if(!chosen)return false;const kept=choice.cards.find(card=>card.uid===chosen.uid);if(!kept)return false;
+      p.hand.push(kept);const discarded=choice.cards.filter(card=>card.uid!==kept.uid);p.discard.push(...discarded);
+      state.actionChoice=null;
+      if(p.id===app.id){app.ui.actionDecisionCardUid=null;app.ui.actionDecisionChoiceId=null}
+      p.currentActionTitle="";p.lastActionTitle="Postman";syncActionPool(p);
+      logLine(state,`${p.name} used Postman, kept ${defOf(kept).title}, and discarded ${discarded.length} card${discarded.length===1?"":"s"}. ${p.actionsLeft} Action${p.actionsLeft===1?"":"s"} remain.`);
+      afterActionSpent(state,p);return true;
     }
     case"scouting-pick":{
       if(!chosen)return false;const kept=choice.cards.find(card=>card.uid===chosen.uid);if(!kept)return false;
@@ -6593,7 +6696,7 @@ function applyGameAction(playerId,action){
     logLine(state,`${p.name} selected ${defOf(chosen).title} to rescue when their empty Draw deck is rebuilt.`);
     return true
   }
-  if(action.type==="start-round"){if(!isHost()||state.phase!=="round-ready")return false;return startRound(state)}
+  if(action.type==="start-round"){if(state.phase!=="round-ready"||!canStartRound(state,playerId))return false;return startRound(state)}
   if(action.type==="finish-event-reveal"){if(!isHost()||state.phase!=="event"||state.phaseStep!=="reveal")return false;return finishEventReveal(state)}
   if(action.type==="event-choice"){if(state.phase!=="event"||state.phaseStep==="reveal"||activeEventDecisionPlayer(state)?.id!==playerId)return false;return resolveEventChoice(state,p,String(action.choiceId||""),Array.isArray(action.cardUids)?action.cardUids:[])}
   if(action.type==="begin-action"){if(!isHost()||state.phase!=="event"||state.phaseStep==="reveal"||hasPendingEventChoices(state))return false;return beginActionPhase(state)}
@@ -6603,18 +6706,36 @@ function applyGameAction(playerId,action){
     p.discard.push(removeByUid(p.hand,ammo.uid));reloadAllWeapons(p);logLine(state,`${p.name} discarded Ammunition and reloaded all Weapons.`);return true
   }
   if(state.phase==="action"&&current?.id===playerId&&action.type==="use-medic"){
-    if(p.usedMedic||p.health>=7||!p.survivors.some(c=>c.defId==="medic"))return false;const supply=p.hand.filter(c=>defOf(c)?.type==="supply").sort((a,b)=>Number(defOf(a).value||0)-Number(defOf(b).value||0))[0];if(!supply)return false;
+    if(p.usedMedic||p.health>=7||!p.survivors.some(c=>c.defId==="medic")||!p.hand.some(c=>defOf(c)?.type==="supply"))return false;
     p.currentActionTitle="Medic";p.lastActionTitle="Medic";
-    p.discard.push(removeByUid(p.hand,supply.uid));p.usedMedic=true;heal(state,p,2);logLine(state,`${p.name}'s Medic used ${defOf(supply).title}.`);p.currentActionTitle="";return true
+    if(p.isBot){const supply=p.hand.filter(c=>defOf(c)?.type==="supply").sort((a,b)=>Number(defOf(a).value||0)-Number(defOf(b).value||0))[0];p.discard.push(removeByUid(p.hand,supply.uid));p.usedMedic=true;heal(state,p,2);logLine(state,`${p.name}'s Medic used ${defOf(supply).title}.`);p.currentActionTitle="";return true}
+    beginActionChoice(state,p,null,"medic-supply",{title:"Medic"});return true
   }
   if(state.phase==="action"&&current?.id===playerId&&action.type==="use-postman"){
-    if(p.actionsLeft<=0||!p.survivors.some(c=>c.defId==="postman"))return false;p.currentActionTitle="Postman";p.lastActionTitle="Postman";if(!spendAction(p))return false;if(!usePostmanAbility(state,p)){refundAction(p);p.currentActionTitle="";return false}p.currentActionTitle="";afterActionSpent(state,p);return true
+    if(p.actionsLeft<=0||!p.survivors.some(c=>c.defId==="postman"))return false;
+    p.currentActionTitle="Postman";p.lastActionTitle="Postman";if(!spendAction(p))return false;
+    if(!p.isBot){
+      const cards=takePersonalCards(state,p,3);
+      if(!cards.length){refundAction(p);p.currentActionTitle="";return false}
+      beginActionChoice(state,p,null,"postman-pick",{cards,title:"Postman"});
+      return true;
+    }
+    if(!usePostmanAbility(state,p)){refundAction(p);p.currentActionTitle="";return false}
+    p.currentActionTitle="";afterActionSpent(state,p);return true
   }
-  if(state.phase==="action"&&current?.id===playerId&&action.type==="use-hitman")return useHitmanAbility(state,p,action.targetPlayerId,action.targetSurvivorUid);
+  if(state.phase==="action"&&current?.id===playerId&&action.type==="use-hitman"){
+    if(!p.survivors.some(c=>c.defId==="hitman")||!hitmanTargets(state,p).length)return false;
+    p.currentActionTitle="Hitman";p.lastActionTitle="Hitman";
+    if(p.isBot){const done=useHitmanAbility(state,p,action.targetPlayerId,action.targetSurvivorUid);p.currentActionTitle="";return done}
+    beginActionChoice(state,p,null,"hitman-target",{title:"Hitman"});return true
+  }
   if(state.phase==="action"&&current?.id===playerId&&action.type==="play-stored"){
-    const card=(p.storedActions||[]).find(c=>c.uid===action.cardUid&&Number(c.storedAtRound||0)<state.round);if(!card||!actionCardPlayability(state,p,card).ok)return false;removeByUid(p.storedActions,card.uid);delete card.storedAtRound;const result=applyActionCard(state,p,card);
-    if(result?.pending){logLine(state,`${p.name} used Janitor to play the stored card for free.`);return true}
-    if(result.destination==="target-hand"&&result.target)result.target.hand.push(card);else{p.discard.push(card);(p.playedActionUidsRound||(p.playedActionUidsRound=[])).push(card.uid)}logLine(state,`${p.name} used Janitor to play the stored card for free.`);return true
+    const card=(p.storedActions||[]).find(c=>c.uid===action.cardUid&&Number(c.storedAtRound||0)<state.round);if(!card||!actionCardPlayability(state,p,card).ok)return false;
+    const title=defOf(card).title;p.currentActionTitle=title;p.lastActionTitle=title;
+    removeByUid(p.storedActions,card.uid);delete card.storedAtRound;const result=applyActionCard(state,p,card);
+    if(result?.pending){logLine(state,`${p.name} used Janitor to play ${title} for free.`);return true}
+    if(result.destination==="target-hand"&&result.target)result.target.hand.push(card);else{p.discard.push(card);(p.playedActionUidsRound||(p.playedActionUidsRound=[])).push(card.uid)}
+    p.currentActionTitle="";syncActionPool(p);logLine(state,`${p.name} used Janitor to play ${title} for free. ${p.actionsLeft} Action${p.actionsLeft===1?"":"s"} remain.`);afterActionSpent(state,p);return true
   }
   if(state.phase==="action"){
     if(!current||current.id!==playerId)return false;
@@ -7068,9 +7189,9 @@ function highlightedPlayer(state){
   return activePlayer(state);
 }
 function renderPlayersStrip(state){
-  const current=highlightedPlayer(state);
+  const current=highlightedPlayer(state),crowned=roundStarter(state);
   return `<div class="players-strip">${state.players.map((p,index)=>`<button type="button" class="player-board-chip${current&&current.id===p.id?" turn":""}${p.id===app.id?" me":""}" data-player-view="${p.id}" data-player-id="${p.id}" aria-label="View ${escapeHtml(p.name)} player status">
-    ${index===state.firstSeat?'<span class="first-player-crown" title="First player" aria-label="First player">♛</span>':""}
+    ${crowned?.id===p.id?'<span class="first-player-crown" title="First player" aria-label="First player">♛</span>':""}
     <span class="pbc-portrait" style="background-image:url('${playerPortraitFor(index)}')"></span>
     <span class="pbc-body">
       <span class="pbc-top"><span class="pbc-name">${escapeHtml(p.name)}${p.id===app.id?' <em>YOU</em>':""}${p.isBot?" 🤖":""}</span></span>
@@ -7108,7 +7229,7 @@ function renderTableau(p){
   const buildings=p.buildings.length?p.buildings.map(c=>cardHTML(c,{small:true,context:"tableau"})).join(""):'<div class="card-grid-empty">No completed buildings.</div>';
   const survivors=p.survivors.length?p.survivors.map(c=>{
     const d=defOf(c);let ability="";
-    if(d?.ability?.kind==="postman")ability=`<button class="card-ability-btn" data-survivor-action="postman"${!myTurn||p.actionsLeft<=0?" disabled":""}>Use Postman • 1 Action</button>`;
+    if(d?.ability?.kind==="postman")ability=`<button class="card-ability-btn" data-survivor-action="postman"${!myTurn||p.actionsLeft<=0||!(p.deck.length||p.discard.length||state.survivorRow.length)?" disabled":""}>Use Postman • 1 Action</button>`;
     if(d?.ability?.kind==="medic")ability=`<button class="card-ability-btn" data-survivor-action="medic"${!myTurn||p.usedMedic||p.health>=7||!p.hand.some(x=>defOf(x)?.type==="supply")?" disabled":""}>Medic • Discard Supply, +2 Life</button>`;
     if(d?.ability?.kind==="hitman")ability=`<button class="card-ability-btn danger-ability" data-survivor-action="hitman"${!myTurn||!bestHitmanTarget(state,p)?" disabled":""}>Use Hitman</button>`;
     return `<div class="ability-card-wrap">${cardHTML(c,{small:true,context:"tableau"})}${ability}</div>`;
@@ -7163,6 +7284,8 @@ function actionCardPlayability(state,p,card){
   const d=defOf(card),kind=d?.action?.kind;
   if(!d||d.type!=="action")return {ok:false,reason:"Not an Action card"};
   if(kind==="takeSupplyTradeDiscard"||kind==="takeSupplyTradeHand")return state.market.flat().some(c=>defOf(c)?.type==="supply")?{ok:true}:{ok:false,reason:"No Supply cards are available in the Trade piles"};
+  if(kind==="scouting"||kind==="plentiful")return (state.tradeDeck.length||state.waste.length)?{ok:true}:{ok:false,reason:"The Main deck and Waste pile are empty"};
+  if(kind==="armedRobbery")return state.players.some(player=>player.id!==p.id&&player.hand.length)?{ok:true}:{ok:false,reason:"No other player has a card to rob"};
   if(kind==="smuggle")return state.market.flat().length?{ok:true}:{ok:false,reason:"The Trade piles are empty"};
   if(kind==="hospitable")return state.survivorRow.length?{ok:true}:{ok:false,reason:"The Survivor Row is empty"};
   if(kind==="heroicRecruit"){
@@ -7220,9 +7343,12 @@ function renderTradeWorkspace(state){
     </section>`).join("")}</div>`;
 }
 function renderRoundReadyWorkspace(state,p){
-  const hostCopy=isHost()?`<button class="round-ready-start" data-start-round>Start Round ${state.round}</button>`:`<div class="round-ready-wait"><span class="pulse"></span> Waiting for the host to start Round ${state.round}</div>`;
-  return `<div class="phase-workspace-head"><b>Round ${state.round} Ready</b><span>Review the table before the Event begins</span></div>
-    <section class="round-ready-panel"><div class="round-ready-kicker">Everyone is seated</div><h2>Take a look before the round starts</h2><p>Review your hand, the other players, the Trade piles, and the face-up Survivors. The Event will not appear until the host starts the round.</p>${hostCopy}</section>
+  const starter=roundStarter(state),starterName=starter?.name||"The crowned first player",mine=canStartRound(state,p?.id);
+  const startControl=mine
+    ?`<button class="round-ready-start" data-start-round>Start Round ${state.round}${starter?.isBot?` • ${escapeHtml(starterName)} Goes First`:""}</button>`
+    :`<div class="round-ready-wait"><span class="pulse"></span> ${starter?.isBot?`${escapeHtml(starterName)} will start Round ${state.round}`:`Waiting for ${escapeHtml(starterName)} to start Round ${state.round}`}</div>`;
+  return `<div class="phase-workspace-head"><b>Round ${state.round} Ready</b><span>${escapeHtml(starterName)} has the crown and goes first</span></div>
+    <section class="round-ready-panel"><div class="round-ready-kicker">Everyone is seated</div><h2>Take a look before the round starts</h2><p>Review your hand, the other players, the Trade piles, and the face-up Survivors. The Event will not appear until ${escapeHtml(starterName)} starts the round.</p>${startControl}</section>
     <div class="ready-hand-label"><b>Your Hand</b><span>${p?.hand.length||0} cards</span></div>
     <div class="phone-card-row">${p?.hand.map(c=>cardHTML(c,{context:"ready-hand"})).join("")||'<div class="phone-empty">Your hand is empty.</div>'}</div>`;
 }
@@ -7352,8 +7478,8 @@ function renderDecisionOverlay(state,p){
     if(app.ui.actionDecisionChoiceId!==actionChoice.id){app.ui.actionDecisionChoiceId=actionChoice.id;app.ui.actionDecisionCardUid=null}
     if(app.ui.actionDecisionCardUid&&!available.has(app.ui.actionDecisionCardUid))app.ui.actionDecisionCardUid=null;
     const selected=app.ui.actionDecisionCardUid,selectedCard=cards.find(card=>card.uid===selected)||null;
-    const labels={"trade-card":"Choose a card from the Trade piles","survivor-row":"Choose a Survivor","scouting-pick":"Choose 1 of the 3 revealed cards","scouting-cost":"Discard a Supply or lose 1 Life","heroic-recruit":"Choose a Survivor to recruit","discard-one":"Choose a card to discard","building-plans":"Choose a Building to complete","trash-survivor":"Choose a Survivor card to trash"};
-    const details={"trade-card":actionChoice.filter==="supply"?"Select the exact Supply card you want.":"Select the exact card you want.","survivor-row":"The chosen Survivor goes to your discard pile.","scouting-pick":"The chosen card goes into your hand. The other two are trashed.","scouting-cost":"Choose a Supply to discard, or lose 1 Life.","heroic-recruit":"Pay 3 Life to recruit the selected Survivor with no Supply payment.","discard-one":"The selected card goes to your discard pile.","building-plans":"The selected half-built Building is completed immediately.","trash-survivor":"The selected Survivor card is permanently trashed."};
+    const labels={"trade-card":"Choose a card from the Trade piles","survivor-row":"Choose a Survivor","scouting-pick":"Choose 1 of the 3 revealed cards","postman-pick":"Choose 1 of the 3 cards","medic-supply":"Choose a Supply for Medic","hitman-target":"Choose an opposing Survivor","scouting-cost":"Discard a Supply or lose 1 Life","heroic-recruit":"Choose a Survivor to recruit","discard-one":"Choose a card to discard","building-plans":"Choose a Building to complete","trash-survivor":"Choose a Survivor card to trash"};
+    const details={"trade-card":actionChoice.filter==="supply"?"Select the exact Supply card you want.":"Select the exact card you want.","survivor-row":"The chosen Survivor goes to your discard pile.","scouting-pick":"The chosen card goes into your hand. The other two are trashed.","postman-pick":"The chosen card goes into your hand. The other cards go to your discard pile.","medic-supply":"Discard the selected Supply card to restore 2 Life.","hitman-target":"Discard your Hitman to remove the selected Survivor from another player's Colony.","scouting-cost":"Choose a Supply to discard, or lose 1 Life.","heroic-recruit":"Pay 3 Life to recruit the selected Survivor with no Supply payment.","discard-one":"The selected card goes to your discard pile.","building-plans":"The selected half-built Building is completed immediately.","trash-survivor":"The selected Survivor card is permanently trashed."};
     const cardLocation=(card,index)=>{
       if(actionChoice.kind==="trade-card"){
         const pileIndex=state.market.findIndex(pile=>pile.some(item=>item.uid===card.uid));
@@ -7362,14 +7488,20 @@ function renderDecisionOverlay(state,p){
         return `Trade Pile ${pileIndex+1} • Card ${within+1} of ${pile.length}`;
       }
       if(actionChoice.kind==="survivor-row")return `Survivor Row • ${index+1} of ${cards.length}`;
+      if(actionChoice.kind==="postman-pick")return `Top of Your Draw Deck • ${index+1} of ${cards.length}`;
+      if(actionChoice.kind==="medic-supply")return `Your Hand • ${index+1} of ${cards.length}`;
+      if(actionChoice.kind==="hitman-target"){
+        const owner=state.players.find(player=>player.id!==p.id&&player.survivors.some(item=>item.uid===card.uid));
+        return `${owner?.name||"Opponent"}'s Colony • ${index+1} of ${cards.length}`;
+      }
       if(actionChoice.kind==="building-plans")return `Your Projects • ${index+1} of ${cards.length}`;
       if(actionChoice.kind==="heroic-recruit"||actionChoice.kind==="discard-one"||actionChoice.kind==="trash-survivor"||actionChoice.kind==="scouting-cost")return `Your Hand • ${index+1} of ${cards.length}`;
       return `${index+1} of ${cards.length}`;
     };
-    const preview=cards.length?`<div class="action-choice-swipe-note"><b>Swipe</b> through the cards • Tap the large card to select it</div><div class="action-choice-nav"><button type="button" data-action-choice-move="-1" aria-label="Previous card">‹</button><span>Move between the ${cards.length} available card${cards.length===1?"":"s"}</span><button type="button" data-action-choice-move="1" aria-label="Next card">›</button></div><div class="action-choice-viewport"><div class="action-choice-track">${cards.map((card,index)=>`<section class="action-choice-slide${card.uid===selected?" selected":""}" data-action-card-select="${card.uid}"><div class="action-choice-position">${escapeHtml(cardLocation(card,index))}</div><div class="collection-card action-choice-card">${cardHTML(card,{selected:card.uid===selected,context:"event-decision-select"})}</div><div class="action-choice-select-state" data-action-choice-card-state="${card.uid}">${card.uid===selected?"Selected — confirm below":"Tap this card to select it"}</div></section>`).join("")}</div></div>`:`<div class="event-hand-empty">There are no eligible cards available.</div>`;
+    const preview=cards.length?`<div class="action-choice-swipe-note"><b>Swipe</b> through the cards • Tap the large card to select it</div><div class="action-choice-nav"><button type="button" data-action-choice-move="-1" aria-label="Previous card">‹</button><span data-action-choice-nav-label>Card 1 of ${cards.length} • swipe or use the arrows</span><button type="button" data-action-choice-move="1" aria-label="Next card">›</button></div><div class="action-choice-viewport"><div class="action-choice-track">${cards.map((card,index)=>`<section class="action-choice-slide${card.uid===selected?" selected":""}" data-action-card-select="${card.uid}"><div class="action-choice-position">${escapeHtml(cardLocation(card,index))}</div><div class="collection-card action-choice-card">${cardHTML(card,{selected:card.uid===selected,context:"event-decision-select"})}</div><div class="action-choice-select-state" data-action-choice-card-state="${card.uid}">${card.uid===selected?"Selected — confirm below":"Tap this card to select it"}</div></section>`).join("")}</div></div>`:`<div class="event-hand-empty">There are no eligible cards available.</div>`;
     const confirmLabel=selectedCard?`Confirm • ${escapeHtml(defOf(selectedCard).title)}`:"Select a Card First";
     const loseButton=actionChoice.kind==="scouting-cost"?`<button class="event-decision-button" data-action-choice-option="lose-life">Lose 1 Life Instead</button>`:"";
-    return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Action card decision"><section class="event-decision-sheet action-card-decision-sheet"><div class="action-choice-header"><div class="event-decision-kicker">Resolve Action • ${escapeHtml(p.name)}</div><h2>${escapeHtml(labels[actionChoice.kind]||"Choose a card")}</h2><div class="event-decision-event">${escapeHtml(actionChoice.title||"Action Card")}</div><p class="event-decision-copy">${escapeHtml(details[actionChoice.kind]||"")}</p></div>${preview}<div class="event-decision-buttons compact-choice-actions">${loseButton}<button class="event-decision-button primary-decision" data-action-choice-confirm data-card-uid="${selectedCard?.uid||""}"${selectedCard?"":" disabled"}>${confirmLabel}</button></div><div class="event-decision-no-close">This Action card will not finish until you make this choice.</div></section></div>`;
+    return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Action card decision"><section class="event-decision-sheet action-card-decision-sheet"><div class="action-choice-header"><div class="event-decision-kicker">Resolve Action • ${escapeHtml(p.name)}</div><h2>${escapeHtml(labels[actionChoice.kind]||"Choose a card")}</h2><div class="event-decision-event">${escapeHtml(actionChoice.title||"Action Card")}</div><p class="event-decision-copy">${escapeHtml(details[actionChoice.kind]||"")}</p></div>${preview}<div class="event-decision-buttons compact-choice-actions">${loseButton}<button class="event-decision-button primary-decision" data-action-choice-confirm data-card-uid="${selectedCard?.uid||""}"${selectedCard?"":" disabled"}>${confirmLabel}</button></div><div class="event-decision-no-close">${actionChoice.card?"This Action card":"This ability"} will not finish until you make this choice.</div></section></div>`;
   }
   const current=activePlayer(state);
   if(state.phase==="action"&&current?.id===p.id&&state.eventActionStartZero&&Number(p.actionsLeft||0)<=0){
@@ -7459,7 +7591,11 @@ function renderGame(){
 }
 function currentMessage(state,p){
   const current=activePlayer(state);
-  if(state.phase==="round-ready")return isHost()?`Review the table, then press Start Round ${state.round}.`:`Waiting for the host to start Round ${state.round}.`;
+  if(state.phase==="round-ready"){
+    const starter=roundStarter(state),starterName=starter?.name||"The crowned first player";
+    if(canStartRound(state,p?.id))return `You have the crown. Review the table, then press Start Round ${state.round}.`;
+    return starter?.isBot?`${starterName} has the crown and will start Round ${state.round}.`:`Waiting for ${starterName} to start Round ${state.round}. ${starterName} goes first.`;
+  }
   if(state.phase==="event"){
     const peek=p&&hasOngoing(p,"peekEvent")&&state.eventDeck[0]?` Next Event: ${defOf(state.eventDeck[0]).title}.`:"";
     if(state.phaseStep==="reveal"){
@@ -7477,8 +7613,8 @@ function currentMessage(state,p){
     const activeChoice=state.actionChoice?.playerId===current?.id?state.actionChoice:null;
     const actionTitle=activeChoice?.title||current?.currentActionTitle||"";
     const remaining=Math.max(0,Number(current?.actionsLeft||0));
-    const gained=Math.max(0,Number(current?.actionsGranted||0)),spent=Math.max(0,Number(current?.actionsSpent||0));
-    const actionBreakdown=gained?` (${gained} gained, ${spent} used this turn)`:"";
+    const started=Math.max(0,Number(current?.actionsStarted||0)),gained=Math.max(0,Number(current?.actionsGranted||0)),spent=Math.max(0,Number(current?.actionsSpent||0));
+    const actionBreakdown=(gained||spent||started!==1)?` (started with ${started}, gained ${gained}, used ${spent})`:"";
     if(current?.id===app.id){
       if(actionTitle)return `You are resolving ${actionTitle}. ${remaining} Action${remaining===1?"":"s"} will remain after this choice is finished.`;
       if(current?.lastActionTitle)return `You completed ${current.lastActionTitle}. You have ${remaining} Action${remaining===1?"":"s"} remaining${actionBreakdown}.`;
@@ -7521,7 +7657,7 @@ function renderControls(state,p){
   wireVoiceButton();
   $("controlsInner").querySelectorAll("[data-act]").forEach(btn=>btn.onclick=()=>{
     const type=btn.dataset.act;
-    if(type==="play-action")requestAction(type,{cardUid:btn.dataset.card});
+    if(type==="play-action"){app.ui.actionDecisionCardUid=null;app.ui.actionDecisionChoiceId=null;app.ui.actionChoiceSuppressUntil=0;requestAction(type,{cardUid:btn.dataset.card})}
     else if(type==="use-ammunition")requestAction(type,{cardUid:btn.dataset.card});
     else if(type==="build"){const supplies=[...app.ui.selected].filter(id=>p.hand.some(c=>c.uid===id&&defOf(c).type==="supply"));requestAction(type,{buildingUid:btn.dataset.building||null,projectId:btn.dataset.project||null,supplyUids:supplies})}
     else if(type==="discard")requestAction(type,{cardUids:[...app.ui.selected]});
@@ -7567,16 +7703,24 @@ function moveActionChoiceCarousel(direction){
   const width=Math.max(1,track.clientWidth),slides=track.querySelectorAll(".action-choice-slide").length;
   const current=Math.round(track.scrollLeft/width),next=Math.max(0,Math.min(slides-1,current+Number(direction||0)));
   track.scrollTo({left:next*width,behavior:"smooth"});
+  setTimeout(updateActionChoiceCarouselLabel,220);
+}
+function centeredActionChoiceCardUid(){
+  const track=document.querySelector(".action-choice-track");if(!track)return"";
+  const slides=[...track.querySelectorAll(".action-choice-slide")];if(!slides.length)return"";
+  const width=Math.max(1,track.clientWidth),index=Math.max(0,Math.min(slides.length-1,Math.round(track.scrollLeft/width)));
+  return slides[index]?.dataset.actionCardSelect||"";
+}
+function updateActionChoiceCarouselLabel(){
+  const track=document.querySelector(".action-choice-track"),label=document.querySelector("[data-action-choice-nav-label]");if(!track||!label)return;
+  const count=track.querySelectorAll(".action-choice-slide").length,width=Math.max(1,track.clientWidth),index=Math.max(0,Math.min(count-1,Math.round(track.scrollLeft/width)));
+  label.textContent=`Card ${index+1} of ${count} • swipe or use the arrows`;
 }
 function installActionChoiceSwipe(){
   const track=document.querySelector(".action-choice-track");if(!track||track.dataset.swipeReady==="1")return;
-  track.dataset.swipeReady="1";let start=null;
-  track.addEventListener("touchstart",e=>{if(e.touches.length===1)start={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
-  track.addEventListener("touchend",e=>{
-    if(!start||!e.changedTouches.length){start=null;return}
-    const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;start=null;
-    if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)*1.15){app.ui.actionChoiceSuppressUntil=Date.now()+450;moveActionChoiceCarousel(dx<0?1:-1)}
-  },{passive:true});
+  track.dataset.swipeReady="1";
+  track.addEventListener("scroll",()=>{app.ui.actionChoiceSuppressUntil=Date.now()+70;updateActionChoiceCarouselLabel()},{passive:true});
+  requestAnimationFrame(updateActionChoiceCarouselLabel);
 }
 function bindGameInteractions(){
   document.querySelectorAll("[data-open-zone]").forEach(btn=>btn.onclick=()=>{
@@ -7596,7 +7740,7 @@ function bindGameInteractions(){
     e.stopPropagation();
     const p=myPlayer();if(!p)return;
     const type=btn.dataset.workAct;
-    if(type==="play-action")requestAction(type,{cardUid:btn.dataset.card});
+    if(type==="play-action"){app.ui.actionDecisionCardUid=null;app.ui.actionDecisionChoiceId=null;app.ui.actionChoiceSuppressUntil=0;requestAction(type,{cardUid:btn.dataset.card})}
     else if(type==="use-ammunition")requestAction(type,{cardUid:btn.dataset.card});
     else if(type==="build"){
       const supplies=[...app.ui.selected].filter(id=>p.hand.some(c=>c.uid===id&&defOf(c).type==="supply"));
@@ -7622,8 +7766,8 @@ function bindGameInteractions(){
   document.querySelectorAll("[data-action-choice-confirm]").forEach(btn=>btn.onclick=e=>{
     e.stopPropagation();
     const selectedSlide=document.querySelector("[data-action-card-select].selected");
-    const cardUid=btn.dataset.cardUid||app.ui.actionDecisionCardUid||selectedSlide?.dataset.actionCardSelect||"";
-    if(!cardUid)return toast("Select a card first.");
+    const cardUid=btn.dataset.cardUid||app.ui.actionDecisionCardUid||selectedSlide?.dataset.actionCardSelect||centeredActionChoiceCardUid()||"";
+    if(!cardUid)return toast("No selectable card is available.");
     requestAction("action-choice",{cardUid,option:"select"});
     app.ui.actionDecisionCardUid=null;
   });
@@ -7703,7 +7847,7 @@ function bindGameInteractions(){
     e.stopPropagation();const kind=btn.dataset.survivorAction;
     if(kind==="postman")requestAction("use-postman");
     if(kind==="medic")requestAction("use-medic");
-    if(kind==="hitman"){const p=myPlayer(),target=bestHitmanTarget(app.state,p);requestAction("use-hitman",{targetPlayerId:target?.owner?.id||null,targetSurvivorUid:target?.card?.uid||null})}
+    if(kind==="hitman")requestAction("use-hitman")
   });
   document.querySelectorAll("[data-play-stored]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("play-stored",{cardUid:btn.dataset.playStored})});
   document.querySelectorAll("[data-rescue-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("choose-rescue",{cardUid:btn.dataset.rescueChoice})});
@@ -7995,7 +8139,8 @@ const BOT_STEP_DELAY_MS=5000;
 const SYSTEM_STEP_DELAY_MS=900;
 function maybeRunBots(){
   if(!isHost()||!app.state||app.botTimer)return;const state=app.state;let bot=null,action=null;
-  if(state.phase==="event"&&state.phaseStep!=="reveal"&&app.localMode&&!hasPendingEventChoices(state)){action={type:"begin-action"};bot={id:app.id}}
+  if(state.phase==="round-ready"){bot=roundStarter(state);if(bot?.isBot)action={type:"start-round"}}
+  else if(state.phase==="event"&&state.phaseStep!=="reveal"&&app.localMode&&!hasPendingEventChoices(state)){action={type:"begin-action"};bot={id:app.id}}
   else if(state.phase==="action"){bot=activePlayer(state);if(bot?.isBot)action=botChooseAction(state,bot)}
   else if(state.phase==="trade"&&state.phaseStep==="bid"){bot=state.players.find(p=>p.isBot&&!p.bidSubmitted);if(bot)action=botBid(state,bot)}
   else if(state.phase==="trade"&&state.phaseStep==="choose"){bot=activePlayer(state);if(bot?.isBot){const choices=state.market.map((pile,i)=>({i,value:pile.reduce((n,c)=>n+Number(defOf(c).trade||0)+Number(defOf(c).sp||0)+Number(defOf(c).value||0),0)})).sort((a,b)=>b.value-a.value);action={type:"pick-trade",pileIndex:choices[0]?.i||0}}}
