@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=6,user-scalable=yes,viewport-fit=cover">
 <meta name="theme-color" content="#101311">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Edge of Humanity — Family Web Edition</title>
@@ -59,6 +62,7 @@ button:disabled{opacity:.38;cursor:default}
 .room-code-label{font-size:11px;letter-spacing:1.5px;color:#b9c2b8;text-transform:uppercase}
 .room-code{font:900 clamp(40px,14vw,72px)/1 system-ui;letter-spacing:7px;color:#f0d179;margin:4px 0 2px}
 .copy-note{font-size:11px;color:#9ca79d}
+.build-stamp{margin-top:6px;color:#d4b75d;font-size:9px;font-weight:900;letter-spacing:.75px;text-transform:uppercase;opacity:.88}
 .player-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px}
 .player-chip{display:flex;align-items:center;gap:9px;border:1px solid #ffffff1c;background:#ffffff08;border-radius:13px;padding:9px;min-height:52px}
 .player-dot{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:1000;color:white;border:2px solid #ffffff4d;flex:none}
@@ -876,7 +880,7 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
   background:linear-gradient(180deg,#050705b8,#020302ee 45%,#000);
   backdrop-filter:blur(7px);
   -webkit-backdrop-filter:blur(7px);
-  touch-action:pan-y;
+  touch-action:pan-x pan-y;
 }
 .event-decision-sheet{
   width:min(100%,620px);
@@ -1150,6 +1154,8 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
   text-align:center;
 }
 .action-choice-swipe-note b{color:#f3d574}
+.action-choice-nav{flex:0 0 auto;display:grid;grid-template-columns:46px 1fr 46px;align-items:center;gap:8px;padding:0 14px 7px;color:#cfc4ae;font:800 11px/1.2 system-ui;text-align:center}
+.action-choice-nav button{width:46px;height:36px;border:1px solid #796840;border-radius:999px;background:#111611;color:#f1d471;font-size:27px;line-height:1;padding:0}
 .action-choice-viewport{
   flex:1 1 auto;
   min-height:0;
@@ -1227,7 +1233,7 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 .action-choice-card .card-top{padding:0 12px!important}
 .action-choice-card .card-kind{font-size:14px!important}
 .action-choice-card .card-title{padding:0 12px!important;font-size:clamp(25px,8vw,34px)!important}
-.action-choice-card .card-effect{padding:11px 13px!important;font-size:clamp(18px,5.1vw,23px)!important;font-weight:720!important;line-height:1.22!important;overflow:auto!important}
+.action-choice-card .card-effect{padding:11px 13px!important;font-size:clamp(16px,4.55vw,20px)!important;font-weight:720!important;line-height:1.2!important;overflow:hidden!important}
 .action-choice-card .card-statbar.fixed-stat-grid{padding:9px 12px!important;gap:8px!important}
 .action-choice-card .card-statbar.fixed-stat-grid .card-stat{height:46px!important;min-height:46px!important;padding:0 14px!important;font-size:15px!important;border-radius:7px!important}
 .action-choice-card .card-statbar.fixed-stat-grid .card-stat b{font-size:20px!important}
@@ -1305,6 +1311,12 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
   .voice-talk-button{width:46px;height:46px;min-height:46px!important;font-size:19px}
 }
 
+
+/* Gameplay repair: no sticky Trade Piles title, and reliable chooser swipes on Android. */
+.trade-collection-slide .collection-menu-title{display:none!important}
+.action-choice-track{touch-action:pan-y pinch-zoom!important}
+.action-choice-slide{touch-action:pan-y!important}
+
 </style>
 </head>
 <body>
@@ -1343,6 +1355,7 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
         <div class="room-code-label">Room Code</div>
         <div class="room-code" id="roomCodeDisplay">----</div>
         <div class="copy-note">Tap the code to copy it</div>
+        <div class="build-stamp" id="buildStamp">Build loading…</div>
       </div>
       <div class="panel">
         <div class="section-head"><b>Players</b><span id="playerCountText">0 connected</span></div>
@@ -1439,6 +1452,25 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 <script>
 (() => {
 "use strict";
+
+const EDGE_BUILD = "2026.08.01-2348";
+const EDGE_BUILD_LABEL = "Build 8/2 • 3:18 PM • Action + Swipe Fix";
+async function clearLegacyEdgeCaches(){
+  try{
+    const previous=localStorage.getItem("edge_active_build");
+    if(previous===EDGE_BUILD)return;
+    if("serviceWorker" in navigator){
+      const registrations=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(reg=>reg.unregister()));
+    }
+    if("caches" in window){
+      const names=await caches.keys();
+      await Promise.all(names.map(name=>caches.delete(name)));
+    }
+    localStorage.setItem("edge_active_build",EDGE_BUILD);
+  }catch(error){console.warn("Edge cache cleanup skipped",error)}
+}
+clearLegacyEdgeCaches();
 
 const SUPABASE_URL = "https://ghnuahsovbpyzrjvbylp.supabase.co";
 const SUPABASE_KEY = "sb_publishable_1Z7ddDl3qiL-8LRLhtML8Q_EOyJs6E2";
@@ -5834,7 +5866,7 @@ const app = {
   state: null,
   messages: [],
   unread: 0,
-  ui: {selected:new Set(), selectedSpecific:null, focusCardUid:null, eventDecisionCardUid:null, eventDecisionSelectedUids:new Set(), eventDecisionScrollLeft:0, actionDecisionCardUid:null, viewerZone:null, viewerParentZone:null, viewerIndex:0, lastPhaseKey:"", boardZoom:1, viewerZoom:1},
+  ui: {selected:new Set(), selectedSpecific:null, focusCardUid:null, eventDecisionCardUid:null, eventDecisionSelectedUids:new Set(), eventDecisionScrollLeft:0, actionDecisionCardUid:null, actionDecisionChoiceId:null, actionChoiceSuppressUntil:0, viewerZone:null, viewerParentZone:null, viewerIndex:0, lastPhaseKey:"", boardZoom:1, viewerZoom:1},
   botTimer: null,
   eventRevealTimer: null,
   backGuardArmed: false
@@ -6000,13 +6032,14 @@ function refillMarket(state,index=null){
   const target=state.players.length+1;
   const fillPile=()=>{const pile=[];while(pile.length<2){const card=drawFromMain(state);if(!card)break;pile.push(card)}return pile};
   if(index!==null){state.market[index]=fillPile();return}
-  while(state.market.length<target)state.market.push(fillPile());
+  while(state.market.length<target)state.market.push([]);
+  for(let i=0;i<target;i++)if(!state.market[i]||!state.market[i].length)state.market[i]=fillPile();
 }
 function makePlayer(info,seat,scenario){
   const equipment=[];
   if(scenario>=2){const gun=makeInst("firearm");gun.bullets=1;equipment.push(gun)}
   return {id:info.id,name:info.name,isBot:!!info.isBot,seat,color:COLORS[seat%COLORS.length],health:7,sp:0,deck:makeDeck(STARTER),hand:[],discard:[],trash:[],survivors:[],projects:[],buildings:[],equipment,
-    actionDone:false,actionsLeft:0,bidSubmitted:false,bidUids:[],bidValue:0,recruited:false,roundBidBoost:0,eventBidBoost:0,roundHandPenalty:0,roundLifeShield:0,skipRefill:false,usedMedic:false,storedActions:[],playedActionUidsRound:[],rescueChoiceUid:null};
+    actionDone:false,actionsLeft:0,actionsStarted:0,actionsGranted:0,actionsSpent:0,currentActionTitle:"",lastActionTitle:"",bidSubmitted:false,bidUids:[],bidValue:0,recruited:false,roundBidBoost:0,eventBidBoost:0,roundHandPenalty:0,roundLifeShield:0,skipRefill:false,usedMedic:false,storedActions:[],playedActionUidsRound:[],rescueChoiceUid:null};
 }
 function createGame(playerInfos,scenario=app.scenario||1){
   scenario=Math.max(1,Math.min(3,Number(scenario)||1));
@@ -6341,7 +6374,7 @@ function applyEvent(state,inst){
 function startRound(state){
   if(!state||state.phase!=="round-ready")return false;
   revealEvent(state);
-  logLine(state,`Round ${state.round} started. Everyone has 10 seconds to read the Event.`);
+  logLine(state,`Round ${state.round} started. Everyone has 20 seconds to read the Event.`);
   return true;
 }
 function revealEvent(state){
@@ -6350,7 +6383,7 @@ function revealEvent(state){
   state.phase="event";
   state.phaseStep="reveal";
   state.activeSeat=state.firstSeat;
-  state.eventRevealUntil=Date.now()+10000;
+  state.eventRevealUntil=Date.now()+20000;
   if(state.event)logLine(state,`Event revealed: ${defOf(state.event).title}.`);
 }
 function finishEventReveal(state){
@@ -6363,18 +6396,43 @@ function finishEventReveal(state){
   else logLine(state,"The Event has been resolved. The Action phase can begin.");
   return true;
 }
+function syncActionPool(p){
+  const tracked=["actionsStarted","actionsGranted","actionsSpent"].every(key=>Object.prototype.hasOwnProperty.call(p,key)&&Number.isFinite(Number(p[key])));
+  if(!tracked){p.actionsStarted=Math.max(0,Number(p.actionsLeft||0));p.actionsGranted=0;p.actionsSpent=0}
+  p.actionsStarted=Math.max(0,Number(p.actionsStarted||0));
+  p.actionsGranted=Math.max(0,Number(p.actionsGranted||0));
+  p.actionsSpent=Math.max(0,Number(p.actionsSpent||0));
+  p.actionsLeft=Math.max(0,p.actionsStarted+p.actionsGranted-p.actionsSpent);
+  return p.actionsLeft;
+}
+function resetActionPool(p,starting){
+  p.actionsStarted=Math.max(0,Number(starting||0));p.actionsGranted=0;p.actionsSpent=0;return syncActionPool(p);
+}
+function grantActions(state,p,amount,source=""){
+  amount=Math.max(0,Number(amount)||0);if(!amount)return syncActionPool(p);
+  p.actionsGranted=Math.max(0,Number(p.actionsGranted||0))+amount;syncActionPool(p);
+  if(source)logLine(state,`${p.name} gained ${amount} Action${amount===1?"":"s"} from ${source}. ${p.actionsLeft} remain.`);
+  return p.actionsLeft;
+}
+function spendAction(p){
+  if(syncActionPool(p)<=0)return false;p.actionsSpent=Math.max(0,Number(p.actionsSpent||0))+1;syncActionPool(p);return true;
+}
+function refundAction(p){
+  p.actionsSpent=Math.max(0,Number(p.actionsSpent||0)-1);return syncActionPool(p);
+}
+function endActionPool(p){p.actionsSpent=Math.max(Number(p.actionsSpent||0),Number(p.actionsStarted||0)+Number(p.actionsGranted||0));return syncActionPool(p)}
 function beginActionPhase(state){
   if(hasPendingEventChoices(state))return false;
-  state.phase="action";state.phaseStep="turn";state.players.forEach(p=>{p.actionDone=false;p.roundBidBoost=0;p.actionsLeft=state.eventActionStartZero?0:Math.max(0,1+hasOngoing(p,"extraActions")+Number(state.roundActionBonus||0)+Number(p.eventActionDelta||0));p.eventActionDelta=0;
-    if(state.townSquare&&p.townSquareChoice&&fireWeapon(state,p)){heal(state,p,1);p.actionsLeft++}p.townSquareChoice=false});state.activeSeat=state.firstSeat;logLine(state,`Round ${state.round} Action phase began.`);return true
+  state.phase="action";state.phaseStep="turn";state.players.forEach(p=>{p.actionDone=false;p.currentActionTitle="";p.lastActionTitle="";p.roundBidBoost=0;const starting=state.eventActionStartZero?0:Math.max(0,1+hasOngoing(p,"extraActions")+Number(state.roundActionBonus||0)+Number(p.eventActionDelta||0));resetActionPool(p,starting);p.eventActionDelta=0;
+    if(state.townSquare&&p.townSquareChoice&&fireWeapon(state,p)){heal(state,p,1);grantActions(state,p,1,"Town Square")}p.townSquareChoice=false});state.activeSeat=state.firstSeat;logLine(state,`Round ${state.round} Action phase began.`);return true
 }
 function advanceActionTurn(state){
-  const p=activePlayer(state);if(p){p.actionDone=true;refillHand(state,p)}
+  const p=activePlayer(state);if(p){p.currentActionTitle="";p.actionDone=true;refillHand(state,p)}
   const order=seatOrder(state),currentIndex=order.indexOf(state.activeSeat);
   for(let step=1;step<=order.length;step++){const seat=order[(currentIndex+step)%order.length];if(!state.players[seat].actionDone){state.activeSeat=seat;return}}
   startTrade(state);
 }
-function afterActionSpent(state,p){if(p.actionsLeft<=0){if(state.eventActionStartZero&&p.health>0)return;advanceActionTurn(state)}}
+function afterActionSpent(state,p){syncActionPool(p);if(p.actionsLeft<=0){if(state.eventActionStartZero&&p.health>0)return;advanceActionTurn(state)}}
 function startTrade(state){state.phase="trade";state.phaseStep="bid";state.activeSeat=state.firstSeat;state.tradeOrder=[];state.tradePickIndex=0;state.players.forEach(p=>{p.bidSubmitted=false;p.bidUids=[];p.bidValue=0});logLine(state,"The Trade phase began.")}
 function calculateBid(state,p,uids){const valid=p.hand.filter(c=>uids.includes(c.uid)&&Number(defOf(c).trade||0)>0);return Math.max(0,valid.reduce((n,c)=>n+Number(defOf(c).trade||0),0)+tradeBonus(p)-Number(state.tradePenalty||0))}
 function resolveBids(state){
@@ -6382,8 +6440,13 @@ function resolveBids(state){
   state.tradePickIndex=0;if(!state.tradeOrder.length){startRecruit(state);return}state.phaseStep="choose";state.activeSeat=state.players.find(p=>p.id===state.tradeOrder[0]).seat;logLine(state,`${activePlayer(state).name} chooses the first Trade pile.`)
 }
 function finishTradePick(state,p,pileIndex){
-  const pile=state.market[pileIndex];if(!pile||!pile.length)return false;p.discard.push(...pile.splice(0));p.bidUids.forEach(id=>{const card=removeByUid(p.hand,id);if(card)trashCard(state,p,card)});logLine(state,`${p.name} claimed Trade pile ${pileIndex+1} with a bid of ${p.bidValue}.`);refillMarket(state,pileIndex);
-  state.tradePickIndex++;if(state.tradePickIndex>=state.tradeOrder.length){startRecruit(state);return true}const nextId=state.tradeOrder[state.tradePickIndex];state.activeSeat=state.players.find(x=>x.id===nextId).seat;return true;
+  const pile=state.market[pileIndex];if(!pile||!pile.length)return false;
+  p.discard.push(...pile.splice(0));
+  p.bidUids.forEach(id=>{const card=removeByUid(p.hand,id);if(card)trashCard(state,p,card)});
+  logLine(state,`${p.name} claimed Trade pile ${pileIndex+1} with a bid of ${p.bidValue}. That pile is now unavailable to the remaining players.`);
+  state.tradePickIndex++;
+  if(state.tradePickIndex>=state.tradeOrder.length){refillMarket(state);startRecruit(state);return true}
+  const nextId=state.tradeOrder[state.tradePickIndex];state.activeSeat=state.players.find(x=>x.id===nextId).seat;return true;
 }
 function startRecruit(state){state.phase="recruit";state.phaseStep="turn";state.players.forEach(p=>p.recruited=false);state.activeSeat=state.firstSeat;logLine(state,"The Recruit phase began.")}
 function recruitSurvivor(state,p,card,supplyCards=[],discount=0){
@@ -6406,7 +6469,7 @@ function endGame(state){
 }
 
 function beginActionChoice(state,p,card,kind,extra={}){
-  state.actionChoice={playerId:p.id,kind,card,stage:extra.stage||"choose",cards:extra.cards||[],destination:extra.destination||"discard",filter:extra.filter||"",title:defOf(card)?.title||"Action Card"};
+  state.actionChoice={id:uid(),playerId:p.id,kind,card,sourceUid:card?.uid||"",sourceDefId:card?.defId||"",stage:extra.stage||"choose",cards:extra.cards||[],destination:extra.destination||"discard",filter:extra.filter||"",title:defOf(card)?.title||"Action Card"};
   logLine(state,`${p.name} must finish resolving ${defOf(card)?.title||"an Action card"}.`);
   return {pending:true};
 }
@@ -6426,10 +6489,13 @@ function actionChoiceCards(state,p,choice){
 }
 function finishPlayedActionCard(state,p,choice,destination="discard"){
   const card=choice?.card;if(!card)return false;
+  const title=defOf(card).title;
   state.actionChoice=null;
+  if(p.id===app.id){app.ui.actionDecisionCardUid=null;app.ui.actionDecisionChoiceId=null}
   if(destination==="target-hand"&&choice.target)choice.target.hand.push(card);
   else{p.discard.push(card);(p.playedActionUidsRound||(p.playedActionUidsRound=[])).push(card.uid)}
-  logLine(state,`${p.name} finished resolving ${defOf(card).title}.`);
+  p.currentActionTitle="";p.lastActionTitle=title;syncActionPool(p);
+  logLine(state,`${p.name} finished resolving ${title}. ${Math.max(0,Number(p.actionsLeft||0))} Action${Number(p.actionsLeft||0)===1?"":"s"} remain.`);
   afterActionSpent(state,p);
   return true;
 }
@@ -6490,11 +6556,11 @@ function applyActionCard(state,p,card){
   switch(a.kind){
     case"none":break;
     case"draw":drawCards(state,p,a.amount);break;
-    case"addActions":p.actionsLeft+=Number(a.amount||0);break;
-    case"painkillers":p.actionsLeft++;drawCards(state,p,2);p.skipRefill=true;break;
-    case"venture":p.actionsLeft+=2;drawCards(state,p,1);break;
-    case"regroup":drawCards(state,p,Math.max(0,handLimit(p)-p.hand.length));p.actionsLeft++;break;
-    case"explore":drawCards(state,p,2);p.actionsLeft++;if(!p.isBot&&p.hand.length)return beginActionChoice(state,p,card,"discard-one");discardLowest(state,p,1);break;
+    case"addActions":grantActions(state,p,Number(a.amount||0),d.title);break;
+    case"painkillers":grantActions(state,p,1,d.title);drawCards(state,p,2);p.skipRefill=true;break;
+    case"venture":grantActions(state,p,2,d.title);drawCards(state,p,1);break;
+    case"regroup":drawCards(state,p,Math.max(0,handLimit(p)-p.hand.length));grantActions(state,p,1,d.title);break;
+    case"explore":drawCards(state,p,2);grantActions(state,p,1,d.title);if(!p.isBot&&p.hand.length)return beginActionChoice(state,p,card,"discard-one");discardLowest(state,p,1);break;
     case"plentiful":{const revealed=[];let found=null;while(!found){const c=drawFromMain(state);if(!c)break;if(defOf(c).type==="supply")found=c;else revealed.push(c)}if(found)p.hand.push(found);revealed.forEach(c=>trashCard(state,p,c));break}
     case"hospitable":if(!p.isBot&&state.survivorRow.length)return beginActionChoice(state,p,card,"survivor-row");takeBestSurvivor(state,p,false);break;
     case"heroicRecruit":{const eligible=p.hand.filter(c=>defOf(c)?.type==="survivor"&&effectiveRecruitCost(p,defOf(c))<=2);if(!p.isBot&&eligible.length&&p.health>=3)return beginActionChoice(state,p,card,"heroic-recruit");const survivor=eligible[0];if(survivor&&p.health>=3){damage(state,p,3,d.title);removeByUid(p.hand,survivor.uid);p.survivors.push(survivor);survivor.bullets=0;p.sp+=Number(defOf(survivor).sp||0)}break}
@@ -6538,10 +6604,11 @@ function applyGameAction(playerId,action){
   }
   if(state.phase==="action"&&current?.id===playerId&&action.type==="use-medic"){
     if(p.usedMedic||p.health>=7||!p.survivors.some(c=>c.defId==="medic"))return false;const supply=p.hand.filter(c=>defOf(c)?.type==="supply").sort((a,b)=>Number(defOf(a).value||0)-Number(defOf(b).value||0))[0];if(!supply)return false;
-    p.discard.push(removeByUid(p.hand,supply.uid));p.usedMedic=true;heal(state,p,2);logLine(state,`${p.name}'s Medic used ${defOf(supply).title}.`);return true
+    p.currentActionTitle="Medic";p.lastActionTitle="Medic";
+    p.discard.push(removeByUid(p.hand,supply.uid));p.usedMedic=true;heal(state,p,2);logLine(state,`${p.name}'s Medic used ${defOf(supply).title}.`);p.currentActionTitle="";return true
   }
   if(state.phase==="action"&&current?.id===playerId&&action.type==="use-postman"){
-    if(p.actionsLeft<=0||!p.survivors.some(c=>c.defId==="postman"))return false;p.actionsLeft--;if(!usePostmanAbility(state,p)){p.actionsLeft++;return false}afterActionSpent(state,p);return true
+    if(p.actionsLeft<=0||!p.survivors.some(c=>c.defId==="postman"))return false;p.currentActionTitle="Postman";p.lastActionTitle="Postman";if(!spendAction(p))return false;if(!usePostmanAbility(state,p)){refundAction(p);p.currentActionTitle="";return false}p.currentActionTitle="";afterActionSpent(state,p);return true
   }
   if(state.phase==="action"&&current?.id===playerId&&action.type==="use-hitman")return useHitmanAbility(state,p,action.targetPlayerId,action.targetSurvivorUid);
   if(state.phase==="action"&&current?.id===playerId&&action.type==="play-stored"){
@@ -6551,13 +6618,16 @@ function applyGameAction(playerId,action){
   }
   if(state.phase==="action"){
     if(!current||current.id!==playerId)return false;
-    if(action.type==="buy-action"&&state.eventActionStartZero&&p.health>0){damage(state,p,1,"Surprise Attack");p.actionsLeft++;return true}
+    if(action.type==="buy-action"&&state.eventActionStartZero&&p.health>0){damage(state,p,1,"Surprise Attack");grantActions(state,p,1,"Surprise Attack");return true}
     if(action.type==="play-action"){
       if(p.actionsLeft<=0)return false;const preview=p.hand.find(c=>c.uid===action.cardUid);if(!preview||defOf(preview).type!=="action"||preview.defId==="under-fire")return false;
       if(!actionCardPlayability(state,p,preview).ok)return false;
-      const card=removeByUid(p.hand,action.cardUid);p.actionsLeft--;const result=applyActionCard(state,p,card);
+      const title=defOf(preview).title;p.currentActionTitle=title;p.lastActionTitle=title;
+      const card=removeByUid(p.hand,action.cardUid);if(!spendAction(p)){p.hand.push(card);return false}const result=applyActionCard(state,p,card);
       if(result?.pending)return true;
       if(result.destination==="target-hand"&&result.target)result.target.hand.push(card);else{p.discard.push(card);(p.playedActionUidsRound||(p.playedActionUidsRound=[])).push(card.uid)}
+      p.currentActionTitle="";
+      logLine(state,`${p.name} completed ${title}. ${Math.max(0,Number(p.actionsLeft||0))} Action${Number(p.actionsLeft||0)===1?"":"s"} remain.`);
       afterActionSpent(state,p);return true;
     }
     if(action.type==="build"){
@@ -6576,16 +6646,17 @@ function applyGameAction(playerId,action){
         logLine(state,`${p.name} started ${defOf(card).title}.`);
       }
       if(!project)return false;
-      p.actionsLeft--;
+      if(!spendAction(p))return false;
+      p.currentActionTitle=`Building ${defOf(project.card).title}`;p.lastActionTitle=p.currentActionTitle;
       const supplies=supplyPreviews.map(c=>removeByUid(p.hand,c.uid)).filter(Boolean);
       const added=supplies.reduce((n,c)=>n+Number(defOf(c)?.value||0),0);
       supplies.forEach(c=>{project.progress+=Number(defOf(c)?.value||0);trashCard(state,p,c)});
       const remaining=Math.max(0,Number(project.cost||0)-Number(project.progress||0));
       logLine(state,`${p.name} added ${added} Supply to ${defOf(project.card).title}${remaining?` — ${remaining} more needed.`:"."}`);
-      checkProjectComplete(state,p,project);afterActionSpent(state,p);return true;
+      checkProjectComplete(state,p,project);p.currentActionTitle="";afterActionSpent(state,p);return true;
     }
-    if(action.type==="discard"){if(p.actionsLeft<=0)return false;p.actionsLeft--;const ids=Array.isArray(action.cardUids)?action.cardUids:[];ids.forEach(id=>{const c=removeByUid(p.hand,id);if(c)p.discard.push(c)});logLine(state,`${p.name} discarded ${ids.length} card${ids.length===1?"":"s"}.`);afterActionSpent(state,p);return true}
-    if(action.type==="rest"){p.actionsLeft=0;logLine(state,`${p.name} ended their Action turn.`);advanceActionTurn(state);return true}
+    if(action.type==="discard"){if(p.actionsLeft<=0||!spendAction(p))return false;p.currentActionTitle="Discarding Cards";p.lastActionTitle="Discarding Cards";const ids=Array.isArray(action.cardUids)?action.cardUids:[];ids.forEach(id=>{const c=removeByUid(p.hand,id);if(c)p.discard.push(c)});logLine(state,`${p.name} discarded ${ids.length} card${ids.length===1?"":"s"}.`);p.currentActionTitle="";afterActionSpent(state,p);return true}
+    if(action.type==="rest"){endActionPool(p);p.currentActionTitle="";logLine(state,`${p.name} ended their Action turn.`);advanceActionTurn(state);return true}
   }
   if(state.phase==="trade"){
     if(state.phaseStep==="bid"&&action.type==="submit-bid"&&!p.bidSubmitted){const ids=(action.cardUids||[]).filter(id=>p.hand.some(c=>c.uid===id&&Number(defOf(c).trade||0)>0));p.bidUids=ids;p.bidValue=calculateBid(state,p,ids);p.bidSubmitted=true;logLine(state,`${p.name} locked in a Trade bid.`);if(state.players.every(x=>x.bidSubmitted))resolveBids(state);return true}
@@ -6859,7 +6930,7 @@ async function disconnectRoom(showHome=true){
     try{await app.client.removeChannel(app.channel)}catch(_){}
   }
   app.channel=null;app.roomCode="";app.hostId=null;app.humans=[];app.started=false;app.localMode=false;app.state=null;app.messages=[];app.unread=0;app.backGuardArmed=false;
-  app.ui.selected.clear();app.ui.selectedSpecific=null;app.ui.focusCardUid=null;app.ui.eventDecisionCardUid=null;app.ui.eventDecisionSelectedUids.clear();app.ui.eventDecisionScrollLeft=0;app.ui.actionDecisionCardUid=null;app.ui.viewerZone=null;app.ui.viewerParentZone=null;app.ui.viewerIndex=0;app.ui.viewerZoom=1;app.ui.lastPhaseKey="";
+  app.ui.selected.clear();app.ui.selectedSpecific=null;app.ui.focusCardUid=null;app.ui.eventDecisionCardUid=null;app.ui.eventDecisionSelectedUids.clear();app.ui.eventDecisionScrollLeft=0;app.ui.actionDecisionCardUid=null;app.ui.actionDecisionChoiceId=null;app.ui.actionChoiceSuppressUntil=0;app.ui.viewerZone=null;app.ui.viewerParentZone=null;app.ui.viewerIndex=0;app.ui.viewerZoom=1;app.ui.lastPhaseKey="";
   history.replaceState({screen:"home"},"",location.pathname+location.search);
   if(showHome)showScreen("homeScreen");
 }
@@ -7145,7 +7216,7 @@ function renderTradeWorkspace(state){
     <div class="trade-phase-list">${state.market.map((pile,i)=>`<section class="trade-phone-pile${canPick?" can-pick":""}">
       <div class="trade-phone-head"><b>Trade Pile ${i+1}</b><span>${pile.length} cards</span></div>
       <div class="phone-card-row">${pile.map(c=>cardHTML(c,{locked:!canPick,context:"market"})).join("")||'<div class="phone-empty">This pile is empty.</div>'}</div>
-      ${canPick?`<button class="trade-pick-button" data-pile-choice="${i}">Choose Pile ${i+1}</button>`:""}
+      ${canPick&&pile.length?`<button class="trade-pick-button" data-pile-choice="${i}">Choose Pile ${i+1}</button>`:canPick?`<button class="trade-pick-button" disabled>Already Claimed</button>`:""}
     </section>`).join("")}</div>`;
 }
 function renderRoundReadyWorkspace(state,p){
@@ -7278,6 +7349,7 @@ function renderDecisionOverlay(state,p){
   const actionChoice=state.actionChoice;
   if(state.phase==="action"&&actionChoice?.playerId===p.id){
     const cards=actionChoiceCards(state,p,actionChoice),available=new Set(cards.map(card=>card.uid));
+    if(app.ui.actionDecisionChoiceId!==actionChoice.id){app.ui.actionDecisionChoiceId=actionChoice.id;app.ui.actionDecisionCardUid=null}
     if(app.ui.actionDecisionCardUid&&!available.has(app.ui.actionDecisionCardUid))app.ui.actionDecisionCardUid=null;
     const selected=app.ui.actionDecisionCardUid,selectedCard=cards.find(card=>card.uid===selected)||null;
     const labels={"trade-card":"Choose a card from the Trade piles","survivor-row":"Choose a Survivor","scouting-pick":"Choose 1 of the 3 revealed cards","scouting-cost":"Discard a Supply or lose 1 Life","heroic-recruit":"Choose a Survivor to recruit","discard-one":"Choose a card to discard","building-plans":"Choose a Building to complete","trash-survivor":"Choose a Survivor card to trash"};
@@ -7294,10 +7366,10 @@ function renderDecisionOverlay(state,p){
       if(actionChoice.kind==="heroic-recruit"||actionChoice.kind==="discard-one"||actionChoice.kind==="trash-survivor"||actionChoice.kind==="scouting-cost")return `Your Hand • ${index+1} of ${cards.length}`;
       return `${index+1} of ${cards.length}`;
     };
-    const preview=cards.length?`<div class="action-choice-swipe-note"><b>Swipe</b> through the cards • Tap the large card to select it</div><div class="action-choice-viewport"><div class="action-choice-track">${cards.map((card,index)=>`<section class="action-choice-slide${card.uid===selected?" selected":""}" data-action-card-select="${card.uid}"><div class="action-choice-position">${escapeHtml(cardLocation(card,index))}</div><div class="collection-card action-choice-card">${cardHTML(card,{selected:card.uid===selected,context:"event-decision-select"})}</div><div class="action-choice-select-state" data-action-choice-card-state="${card.uid}">${card.uid===selected?"Selected — confirm below":"Tap this card to select it"}</div></section>`).join("")}</div></div>`:`<div class="event-hand-empty">There are no eligible cards available.</div>`;
+    const preview=cards.length?`<div class="action-choice-swipe-note"><b>Swipe</b> through the cards • Tap the large card to select it</div><div class="action-choice-nav"><button type="button" data-action-choice-move="-1" aria-label="Previous card">‹</button><span>Move between the ${cards.length} available card${cards.length===1?"":"s"}</span><button type="button" data-action-choice-move="1" aria-label="Next card">›</button></div><div class="action-choice-viewport"><div class="action-choice-track">${cards.map((card,index)=>`<section class="action-choice-slide${card.uid===selected?" selected":""}" data-action-card-select="${card.uid}"><div class="action-choice-position">${escapeHtml(cardLocation(card,index))}</div><div class="collection-card action-choice-card">${cardHTML(card,{selected:card.uid===selected,context:"event-decision-select"})}</div><div class="action-choice-select-state" data-action-choice-card-state="${card.uid}">${card.uid===selected?"Selected — confirm below":"Tap this card to select it"}</div></section>`).join("")}</div></div>`:`<div class="event-hand-empty">There are no eligible cards available.</div>`;
     const confirmLabel=selectedCard?`Confirm • ${escapeHtml(defOf(selectedCard).title)}`:"Select a Card First";
     const loseButton=actionChoice.kind==="scouting-cost"?`<button class="event-decision-button" data-action-choice-option="lose-life">Lose 1 Life Instead</button>`:"";
-    return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Action card decision"><section class="event-decision-sheet action-card-decision-sheet"><div class="action-choice-header"><div class="event-decision-kicker">Resolve Action • ${escapeHtml(p.name)}</div><h2>${escapeHtml(labels[actionChoice.kind]||"Choose a card")}</h2><div class="event-decision-event">${escapeHtml(actionChoice.title||"Action Card")}</div><p class="event-decision-copy">${escapeHtml(details[actionChoice.kind]||"")}</p></div>${preview}<div class="event-decision-buttons compact-choice-actions">${loseButton}<button class="event-decision-button primary-decision" data-action-choice-confirm${selectedCard?"":" disabled"}>${confirmLabel}</button></div><div class="event-decision-no-close">This Action card will not finish until you make this choice.</div></section></div>`;
+    return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Action card decision"><section class="event-decision-sheet action-card-decision-sheet"><div class="action-choice-header"><div class="event-decision-kicker">Resolve Action • ${escapeHtml(p.name)}</div><h2>${escapeHtml(labels[actionChoice.kind]||"Choose a card")}</h2><div class="event-decision-event">${escapeHtml(actionChoice.title||"Action Card")}</div><p class="event-decision-copy">${escapeHtml(details[actionChoice.kind]||"")}</p></div>${preview}<div class="event-decision-buttons compact-choice-actions">${loseButton}<button class="event-decision-button primary-decision" data-action-choice-confirm data-card-uid="${selectedCard?.uid||""}"${selectedCard?"":" disabled"}>${confirmLabel}</button></div><div class="event-decision-no-close">This Action card will not finish until you make this choice.</div></section></div>`;
   }
   const current=activePlayer(state);
   if(state.phase==="action"&&current?.id===p.id&&state.eventActionStartZero&&Number(p.actionsLeft||0)<=0){
@@ -7401,7 +7473,21 @@ function currentMessage(state,p){
     }
     return (isHost()?"All Event choices are complete. Begin the Action phase.":"Waiting for the host to begin the Action phase.")+peek;
   }
-  if(state.phase==="action")return current?.id===app.id?`You have ${Math.max(0,p?.actionsLeft||0)} Action${Number(p?.actionsLeft||0)===1?"":"s"} remaining.`:`${current?.name||"A player"} is taking their Action turn.`;
+  if(state.phase==="action"){
+    const activeChoice=state.actionChoice?.playerId===current?.id?state.actionChoice:null;
+    const actionTitle=activeChoice?.title||current?.currentActionTitle||"";
+    const remaining=Math.max(0,Number(current?.actionsLeft||0));
+    const gained=Math.max(0,Number(current?.actionsGranted||0)),spent=Math.max(0,Number(current?.actionsSpent||0));
+    const actionBreakdown=gained?` (${gained} gained, ${spent} used this turn)`:"";
+    if(current?.id===app.id){
+      if(actionTitle)return `You are resolving ${actionTitle}. ${remaining} Action${remaining===1?"":"s"} will remain after this choice is finished.`;
+      if(current?.lastActionTitle)return `You completed ${current.lastActionTitle}. You have ${remaining} Action${remaining===1?"":"s"} remaining${actionBreakdown}.`;
+      return `You have ${remaining} Action${remaining===1?"":"s"} remaining${actionBreakdown}.`;
+    }
+    if(actionTitle)return `${current?.name||"A player"} is resolving ${actionTitle}.`;
+    if(current?.lastActionTitle)return `${current?.name||"A player"} completed ${current.lastActionTitle} and has ${remaining} Action${remaining===1?"":"s"} remaining${actionBreakdown}.`;
+    return `${current?.name||"A player"} is taking their Action turn.`;
+  }
   if(state.phase==="trade"&&state.phaseStep==="bid")return p?.bidSubmitted?"Your bid is locked. Waiting for everyone else.":"Select cards showing a TRADE value, including Supply cards, then submit your secret bid.";
   if(state.phase==="trade"&&state.phaseStep==="choose")return current?.id===app.id?"Choose one Trade pile.":`${current?.name||"A player"} is choosing a Trade pile.`;
   if(state.phase==="recruit")return current?.id===app.id?"Select a Survivor and enough Supply cards to pay its Recruit cost, or pass.":`${current?.name||"A player"} is recruiting.`;
@@ -7476,6 +7562,22 @@ function zoneAndIndexForCard(uidValue){
   }
   return null;
 }
+function moveActionChoiceCarousel(direction){
+  const track=document.querySelector(".action-choice-track");if(!track)return;
+  const width=Math.max(1,track.clientWidth),slides=track.querySelectorAll(".action-choice-slide").length;
+  const current=Math.round(track.scrollLeft/width),next=Math.max(0,Math.min(slides-1,current+Number(direction||0)));
+  track.scrollTo({left:next*width,behavior:"smooth"});
+}
+function installActionChoiceSwipe(){
+  const track=document.querySelector(".action-choice-track");if(!track||track.dataset.swipeReady==="1")return;
+  track.dataset.swipeReady="1";let start=null;
+  track.addEventListener("touchstart",e=>{if(e.touches.length===1)start={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
+  track.addEventListener("touchend",e=>{
+    if(!start||!e.changedTouches.length){start=null;return}
+    const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;start=null;
+    if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)*1.15){app.ui.actionChoiceSuppressUntil=Date.now()+450;moveActionChoiceCarousel(dx<0?1:-1)}
+  },{passive:true});
+}
 function bindGameInteractions(){
   document.querySelectorAll("[data-open-zone]").forEach(btn=>btn.onclick=()=>{
     const zone=btn.dataset.openZone;
@@ -7501,7 +7603,10 @@ function bindGameInteractions(){
       requestAction(type,{buildingUid:btn.dataset.building||null,projectId:btn.dataset.project||null,supplyUids:supplies});
     }else if(type==="discard")requestAction(type,{cardUids:[...app.ui.selected]});
   });
+  installActionChoiceSwipe();
+  document.querySelectorAll("[data-action-choice-move]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();moveActionChoiceCarousel(Number(btn.dataset.actionChoiceMove||0))});
   document.querySelectorAll("[data-action-card-select]").forEach(choice=>choice.onclick=e=>{
+    if(Date.now()<Number(app.ui.actionChoiceSuppressUntil||0))return;
     if(e.target.closest(".card-info"))return;e.stopPropagation();
     const id=choice.dataset.actionCardSelect;app.ui.actionDecisionCardUid=app.ui.actionDecisionCardUid===id?null:id;
     document.querySelectorAll("[data-action-card-select]").forEach(el=>{
@@ -7512,12 +7617,17 @@ function bindGameInteractions(){
     });
     const confirm=document.querySelector("[data-action-choice-confirm]");
     const card=actionChoiceCards(app.state,myPlayer(),app.state.actionChoice).find(item=>item.uid===app.ui.actionDecisionCardUid);
-    if(confirm){confirm.toggleAttribute("disabled",!card);confirm.textContent=card?`Confirm • ${defOf(card).title}`:"Select a Card First"}
+    if(confirm){confirm.toggleAttribute("disabled",!card);confirm.dataset.cardUid=card?.uid||"";confirm.textContent=card?`Confirm • ${defOf(card).title}`:"Select a Card First"}
   });
   document.querySelectorAll("[data-action-choice-confirm]").forEach(btn=>btn.onclick=e=>{
-    e.stopPropagation();const cardUid=app.ui.actionDecisionCardUid;if(!cardUid)return toast("Select a card first.");app.ui.actionDecisionCardUid=null;requestAction("action-choice",{cardUid,option:"select"});
+    e.stopPropagation();
+    const selectedSlide=document.querySelector("[data-action-card-select].selected");
+    const cardUid=btn.dataset.cardUid||app.ui.actionDecisionCardUid||selectedSlide?.dataset.actionCardSelect||"";
+    if(!cardUid)return toast("Select a card first.");
+    requestAction("action-choice",{cardUid,option:"select"});
+    app.ui.actionDecisionCardUid=null;
   });
-  document.querySelectorAll("[data-action-choice-option]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();app.ui.actionDecisionCardUid=null;requestAction("action-choice",{option:btn.dataset.actionChoiceOption})});
+  document.querySelectorAll("[data-action-choice-option]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();app.ui.actionDecisionCardUid=null;app.ui.actionDecisionChoiceId=null;requestAction("action-choice",{option:btn.dataset.actionChoiceOption})});
   document.querySelectorAll("[data-event-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();app.ui.eventDecisionCardUid=null;app.ui.eventDecisionSelectedUids.clear();requestAction("event-choice",{choiceId:btn.dataset.eventChoice})});
   document.querySelectorAll("[data-event-card-select]").forEach(choice=>choice.onclick=e=>{
     if(e.target.closest(".card-info"))return;
@@ -7712,7 +7822,7 @@ function renderCollection(zone,preservePosition=false){
     return;
   }
   if(data.menu){
-    track.innerHTML=`<section class="collection-menu-slide trade-collection-slide"><h2 class="collection-menu-title">Trade Piles</h2><div class="trade-phase-list collection-trade-list">${data.menu.map(x=>{
+    track.innerHTML=`<section class="collection-menu-slide trade-collection-slide"><div class="trade-phase-list collection-trade-list">${data.menu.map(x=>{
       const pile=app.state?.market?.[x.index]||[];
       return `<section class="trade-phone-pile collection-trade-pile"><div class="trade-phone-head"><b>${escapeHtml(x.label)}</b><span>${x.count} card${x.count===1?"":"s"}</span></div><div class="phone-card-row collection-market-row">${pile.map(c=>cardHTML(c,{context:"market-overview"})).join("")||'<div class="phone-empty">This pile is empty.</div>'}</div></section>`;
     }).join("")||'<div class="viewer-empty">No trade piles are available.</div>'}</div></section>`;
@@ -7951,6 +8061,8 @@ $("collectionViewer").addEventListener("dblclick",()=>setViewerZoom(1));
 
 const saved=localStorage.getItem("humanity_player_name")||localStorage.getItem("wonders_player_name")||localStorage.getItem("rider_saved_name")||"";
 $("username").value=saved;
+if($("buildStamp"))$("buildStamp").textContent=EDGE_BUILD_LABEL;
+document.documentElement.dataset.edgeBuild=EDGE_BUILD;
 const hash=cleanCode(location.hash.slice(1));if(hash)$("roomCodeInput").value=hash;
 
 })();
