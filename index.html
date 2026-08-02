@@ -924,8 +924,8 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 }
 .event-decision-card-strip::-webkit-scrollbar{display:none}
 .event-decision-card-strip .game-card{
-  flex:0 0 min(58vw,230px)!important;
-  width:min(58vw,230px)!important;
+  flex:0 0 min(82vw,360px)!important;
+  width:min(82vw,360px)!important;
   scroll-snap-align:center;
   pointer-events:none;
 }
@@ -980,8 +980,8 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 /* Selectable cards inside Event decisions */
 .event-decision-card-help{display:grid;gap:3px;padding:0 16px 9px;text-align:center;color:#e8ddc7;font:750 12px/1.3 system-ui}
 .event-decision-card-help b{color:#fff1c8;font-size:14px}.event-decision-card-help span{color:#bfb6a5}.event-decision-card-help strong{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;border:1px solid #ffffff55;color:#fff;font-size:11px}
-.event-decision-card-strip.selectable{padding-left:8vw;padding-right:18vw;scroll-padding-inline:8vw;align-items:flex-start}
-.event-decision-card-choice{position:relative;flex:0 0 min(68vw,255px);width:min(68vw,255px);padding:4px;border:3px solid transparent;border-radius:18px;scroll-snap-align:start;transition:.14s transform,.14s border-color,.14s box-shadow}
+.event-decision-card-strip.selectable{padding-left:5vw;padding-right:18vw;scroll-padding-inline:5vw;align-items:flex-start}
+.event-decision-card-choice{position:relative;flex:0 0 min(82vw,360px);width:min(82vw,360px);padding:4px;border:3px solid transparent;border-radius:18px;scroll-snap-align:start;transition:.14s transform,.14s border-color,.14s box-shadow}
 .event-decision-card-choice .game-card{width:100%!important;max-width:none;pointer-events:auto!important}
 .event-decision-card-choice.selected{border-color:#f0c75d;background:#e6b94018;box-shadow:0 0 0 3px #eec34f44,0 0 26px #e0ab35aa;transform:translateY(-2px)}
 .event-decision-card-choice.selected::after{content:"SELECTED";position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:5;padding:4px 9px;border-radius:999px;background:#e5bb4d;color:#241a08;border:1px solid #fff0aa;font:1000 9px/1 system-ui;letter-spacing:.8px;box-shadow:0 3px 10px #0009}
@@ -1053,19 +1053,60 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 .event-hand-status{display:grid;gap:5px;margin:0 14px 8px;padding:11px 13px;border:1px solid #84714b;border-radius:12px;background:#211e16;color:#f0e3c6;text-align:center}
 .event-hand-status b{font:900 16px/1.25 system-ui}.event-hand-status span{font:800 14px/1.25 system-ui}.event-hand-status strong{color:#ffcf61;font-size:18px}
 .event-hand-help{padding:0 16px 8px;color:#bdb5a5;font:750 12px/1.3 system-ui;text-align:center}
-.event-hand-strip{flex:1;min-height:0;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:4px 16vw 12px 7vw;scroll-padding-inline:7vw;scroll-snap-type:x mandatory;align-items:center;scrollbar-width:none}
+.event-hand-strip{flex:1;min-height:0;display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;padding:4px 18vw 12px 5vw;scroll-padding-inline:5vw;scroll-snap-type:x mandatory;align-items:center;scrollbar-width:none}
 .event-hand-strip::-webkit-scrollbar{display:none}
-.event-hand-choice{position:relative;flex:0 0 min(68vw,286px);width:min(68vw,286px);padding:4px;border:3px solid transparent;border-radius:18px;scroll-snap-align:start;transition:.14s transform,.14s border-color,.14s box-shadow}
-.event-hand-choice .game-card{width:100%!important;max-width:none!important;height:auto!important;aspect-ratio:128/188;display:grid!important;grid-template-rows:8% 11% 32% 29% 20%;pointer-events:auto!important;border-radius:16px}
-.event-hand-choice .game-card .card-top,.event-hand-choice .game-card .card-title,.event-hand-choice .game-card .card-art,.event-hand-choice .game-card .card-effect,.event-hand-choice .game-card .card-statbar{height:auto!important;min-height:0}
-.event-hand-choice .game-card .card-top{padding:0 7px}
-.event-hand-choice .game-card .card-title{padding:0 7px;font-size:clamp(20px,5.2vw,27px)}
-.event-hand-choice .game-card .card-kind{font-size:11px}
-.event-hand-choice .game-card .card-effect{padding:8px 9px;font-size:clamp(13px,3.5vw,17px);line-height:1.18}
-.event-hand-choice .game-card .card-statbar.fixed-stat-grid{height:auto!important;padding:6px 8px 8px;gap:6px}
-.event-hand-choice .game-card .card-statbar.fixed-stat-grid .card-stat{height:auto;min-height:30px;padding:0 5px;font-size:10px}
-.event-hand-choice .game-card .card-statbar.fixed-stat-grid .card-stat b{font-size:15px}
-.event-hand-choice .game-card .card-info{display:grid!important;width:30px;height:30px;font-size:15px}
+.event-hand-choice{position:relative;flex:0 0 min(82vw,360px);width:min(82vw,360px);padding:4px;border:3px solid transparent;border-radius:18px;scroll-snap-align:start;transition:.14s transform,.14s border-color,.14s box-shadow}
+/* Event choices always use the same wide horizontal card shape. */
+.event-hand-choice .game-card,
+.event-decision-card-choice .game-card,
+.event-decision-card-strip>.game-card{
+  width:100%!important;
+  max-width:none!important;
+  height:auto!important;
+  aspect-ratio:16/10!important;
+  display:grid!important;
+  grid-template-rows:11% 15% 34% 25% 15%!important;
+  pointer-events:auto!important;
+  border-radius:16px;
+}
+.event-hand-choice .game-card .card-top,
+.event-hand-choice .game-card .card-title,
+.event-hand-choice .game-card .card-art,
+.event-hand-choice .game-card .card-effect,
+.event-hand-choice .game-card .card-statbar,
+.event-decision-card-choice .game-card .card-top,
+.event-decision-card-choice .game-card .card-title,
+.event-decision-card-choice .game-card .card-art,
+.event-decision-card-choice .game-card .card-effect,
+.event-decision-card-choice .game-card .card-statbar,
+.event-decision-card-strip>.game-card .card-top,
+.event-decision-card-strip>.game-card .card-title,
+.event-decision-card-strip>.game-card .card-art,
+.event-decision-card-strip>.game-card .card-effect,
+.event-decision-card-strip>.game-card .card-statbar{height:auto!important;min-height:0!important}
+.event-hand-choice .game-card .card-top,
+.event-decision-card-choice .game-card .card-top,
+.event-decision-card-strip>.game-card .card-top{padding:0 8px!important}
+.event-hand-choice .game-card .card-title,
+.event-decision-card-choice .game-card .card-title,
+.event-decision-card-strip>.game-card .card-title{padding:0 8px!important;font-size:clamp(18px,4.6vw,24px)!important}
+.event-hand-choice .game-card .card-kind,
+.event-decision-card-choice .game-card .card-kind,
+.event-decision-card-strip>.game-card .card-kind{font-size:10px!important}
+.event-hand-choice .game-card .card-effect,
+.event-decision-card-choice .game-card .card-effect,
+.event-decision-card-strip>.game-card .card-effect{padding:6px 8px!important;font-size:clamp(11px,3vw,15px)!important;line-height:1.15!important}
+.event-hand-choice .game-card .card-statbar.fixed-stat-grid,
+.event-decision-card-choice .game-card .card-statbar.fixed-stat-grid,
+.event-decision-card-strip>.game-card .card-statbar.fixed-stat-grid{height:auto!important;padding:5px 7px 7px!important;gap:5px!important}
+.event-hand-choice .game-card .card-statbar.fixed-stat-grid .card-stat,
+.event-decision-card-choice .game-card .card-statbar.fixed-stat-grid .card-stat,
+.event-decision-card-strip>.game-card .card-statbar.fixed-stat-grid .card-stat{height:auto!important;min-height:25px!important;padding:0 4px!important;font-size:9px!important}
+.event-hand-choice .game-card .card-statbar.fixed-stat-grid .card-stat b,
+.event-decision-card-choice .game-card .card-statbar.fixed-stat-grid .card-stat b,
+.event-decision-card-strip>.game-card .card-statbar.fixed-stat-grid .card-stat b{font-size:14px!important}
+.event-hand-choice .game-card .card-info,
+.event-decision-card-choice .game-card .card-info{display:grid!important;width:30px;height:30px;font-size:15px}
 .event-hand-choice.selected{border-color:#f0c75d;background:#e6b94018;box-shadow:0 0 0 4px #eec34f44,0 0 30px #e0ab35aa;transform:translateY(-3px)}
 .event-hand-choice.selected::after{content:"SELECTED";position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:5;padding:5px 10px;border-radius:999px;background:#e5bb4d;color:#241a08;border:1px solid #fff0aa;font:1000 10px/1 system-ui;letter-spacing:.8px;box-shadow:0 3px 10px #0009}
 .event-hand-empty{flex:1;display:grid;place-items:center;margin:12px 18px;padding:20px;border:1px dashed #73694f;border-radius:15px;color:#cfc5b1;text-align:center}
@@ -1074,7 +1115,7 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 @media(max-height:720px){
   .event-reveal-sheet.vertical-event-sheet{grid-template-rows:auto minmax(130px,27dvh) minmax(0,1fr) auto}
   .event-reveal-reading{padding:10px 14px}.vertical-event-sheet .event-reveal-title{font-size:31px}.vertical-event-sheet .event-reveal-summary-copy{font-size:20px}
-  .event-decision-effect-large{font-size:17px;padding:9px 11px}.event-hand-status{padding:8px 10px}.event-hand-choice{flex-basis:min(62vw,248px);width:min(62vw,248px)}
+  .event-decision-effect-large{font-size:17px;padding:9px 11px}.event-hand-status{padding:8px 10px}.event-hand-choice{flex-basis:min(78vw,340px);width:min(78vw,340px)}
 }
 
 </style>
@@ -5606,7 +5647,7 @@ const app = {
   state: null,
   messages: [],
   unread: 0,
-  ui: {selected:new Set(), selectedSpecific:null, focusCardUid:null, eventDecisionCardUid:null, eventDecisionSelectedUids:new Set(), eventDecisionScrollLeft:0, viewerZone:null, viewerParentZone:null, viewerIndex:0, lastPhaseKey:"", boardZoom:1, viewerZoom:1},
+  ui: {selected:new Set(), selectedSpecific:null, focusCardUid:null, eventDecisionCardUid:null, eventDecisionSelectedUids:new Set(), eventDecisionScrollLeft:0, actionDecisionCardUid:null, viewerZone:null, viewerParentZone:null, viewerIndex:0, lastPhaseKey:"", boardZoom:1, viewerZoom:1},
   botTimer: null,
   eventRevealTimer: null,
   backGuardArmed: false
@@ -5786,7 +5827,7 @@ function createGame(playerInfos,scenario=app.scenario||1){
   const state={version:5,token:uid(),scenario,scenarioName:SCENARIO_NAMES[scenario],round:1,maxRounds:eventIds.length,targetSP:11,phase:"round-ready",phaseStep:"ready",firstSeat:0,activeSeat:0,event:null,
     players:playerInfos.map((x,i)=>makePlayer(x,i,scenario)),tradeDeck:makeDeck(buildScenarioMainIds(scenario)),survivorDeck:makeDeck(buildScenarioSurvivorIds(scenario)),eventDeck:eventIds.map(makeInst),
     market:[],survivorRow:[],survivorWaste:[],unluckyUid:null,waste:[],tradeOrder:[],tradePickIndex:0,tradePenalty:0,winnerIds:[],log:[],updatedAt:Date.now(),
-    roundTrashSupplyDamage:0,roundHandPenalty:0,eventActionStartZero:false,roundActionBonus:0,townSquare:false,eventChoices:{}};
+    roundTrashSupplyDamage:0,roundHandPenalty:0,eventActionStartZero:false,roundActionBonus:0,townSquare:false,eventChoices:{},actionChoice:null};
   state.players.forEach(p=>drawCards(state,p,5));
   refillSurvivors(state);markUnlucky(state);refillMarket(state);logLine(state,`${state.scenarioName} is ready. The host will start Round 1.`);return state;
 }
@@ -5856,7 +5897,7 @@ function takeBestSurvivor(state,p,toHand=false){
   logLine(state,`${p.name} took ${defOf(card).title} from the Survivor Row.`);
   return true;
 }
-function resetRoundEventFlags(state){state.tradePenalty=0;state.roundTrashSupplyDamage=0;state.roundHandPenalty=0;state.eventActionStartZero=false;state.roundActionBonus=0;state.townSquare=false;state.eventChoices={};state.players.forEach(p=>{p.eventBidBoost=0;p.roundHandPenalty=0;p.roundLifeShield=0;p.usedMedic=false;p.townSquareChoice=false})}
+function resetRoundEventFlags(state){state.actionChoice=null;state.tradePenalty=0;state.roundTrashSupplyDamage=0;state.roundHandPenalty=0;state.eventActionStartZero=false;state.roundActionBonus=0;state.townSquare=false;state.eventChoices={};state.players.forEach(p=>{p.eventBidBoost=0;p.roundHandPenalty=0;p.roundLifeShield=0;p.usedMedic=false;p.townSquareChoice=false})}
 function eventBidOrder(state,bids){const order=seatOrder(state);return state.players.slice().sort((a,b)=>(bids[b.id]||0)-(bids[a.id]||0)||order.indexOf(a.seat)-order.indexOf(b.seat))}
 function ensureEventChoiceMap(state){
   if(!state.eventChoices||Array.isArray(state.eventChoices))state.eventChoices={};
@@ -6176,6 +6217,86 @@ function endGame(state){
   state.phase="gameover";state.phaseStep="done";state.players.forEach(p=>{let bonus=0;p.survivors.forEach(inst=>{const eg=defOf(inst)?.endGame;if(eg?.kind==="perSurvivor")bonus+=p.survivors.filter(x=>x.defId===eg.target).length*Number(eg.amount||0)});if(bonus){p.sp+=bonus;logLine(state,`${p.name} gained ${bonus} end-game SP.`)}});
   const best=Math.max(...state.players.map(p=>p.sp)),bestLife=Math.max(...state.players.filter(p=>p.sp===best).map(p=>p.health));state.winnerIds=state.players.filter(p=>p.sp===best&&p.health===bestLife).map(p=>p.id);logLine(state,`${state.players.filter(p=>state.winnerIds.includes(p.id)).map(p=>p.name).join(" & ")} won with ${best} SP.`)
 }
+
+function beginActionChoice(state,p,card,kind,extra={}){
+  state.actionChoice={playerId:p.id,kind,card,stage:extra.stage||"choose",cards:extra.cards||[],destination:extra.destination||"discard",filter:extra.filter||"",title:defOf(card)?.title||"Action Card"};
+  logLine(state,`${p.name} must finish resolving ${defOf(card)?.title||"an Action card"}.`);
+  return {pending:true};
+}
+function actionChoiceCards(state,p,choice){
+  if(!choice||!p)return[];
+  if(choice.kind==="trade-card"){
+    return state.market.flat().filter(card=>choice.filter!=="supply"||defOf(card)?.type==="supply");
+  }
+  if(choice.kind==="survivor-row")return state.survivorRow.slice();
+  if(choice.kind==="scouting-pick")return (choice.cards||[]).slice();
+  if(choice.kind==="scouting-cost")return p.hand.filter(card=>defOf(card)?.type==="supply");
+  if(choice.kind==="heroic-recruit")return p.hand.filter(card=>defOf(card)?.type==="survivor"&&effectiveRecruitCost(p,defOf(card))<=2);
+  if(choice.kind==="discard-one")return p.hand.slice();
+  if(choice.kind==="building-plans")return p.projects.filter(project=>Number(project.progress||0)>=Math.ceil(Number(project.cost||0)/2)).map(project=>project.card);
+  if(choice.kind==="trash-survivor")return p.hand.filter(card=>defOf(card)?.type==="survivor");
+  return[];
+}
+function finishPlayedActionCard(state,p,choice,destination="discard"){
+  const card=choice?.card;if(!card)return false;
+  state.actionChoice=null;
+  if(destination==="target-hand"&&choice.target)choice.target.hand.push(card);
+  else{p.discard.push(card);(p.playedActionUidsRound||(p.playedActionUidsRound=[])).push(card.uid)}
+  logLine(state,`${p.name} finished resolving ${defOf(card).title}.`);
+  afterActionSpent(state,p);
+  return true;
+}
+function takeMarketCardByUid(state,p,cardUid,destination="discard",supplyOnly=false){
+  for(let pi=0;pi<state.market.length;pi++){
+    const ci=state.market[pi].findIndex(card=>card.uid===cardUid&&(supplyOnly?defOf(card)?.type==="supply":true));
+    if(ci<0)continue;
+    const card=state.market[pi].splice(ci,1)[0];
+    (destination==="hand"?p.hand:p.discard).push(card);
+    if(!state.market[pi].length)refillMarket(state,pi);
+    logLine(state,`${p.name} chose ${defOf(card).title} from Trade Pile ${pi+1}.`);
+    return true;
+  }
+  return false;
+}
+function resolveActionChoice(state,p,cardUid,option="select"){
+  const choice=state.actionChoice;if(!choice||choice.playerId!==p.id)return false;
+  const chosen=cardUid?actionChoiceCards(state,p,choice).find(card=>card.uid===cardUid):null;
+  switch(choice.kind){
+    case"trade-card":
+      if(!chosen||!takeMarketCardByUid(state,p,chosen.uid,choice.destination,choice.filter==="supply"))return false;
+      return finishPlayedActionCard(state,p,choice);
+    case"survivor-row":{
+      if(!chosen)return false;const index=state.survivorRow.findIndex(card=>card.uid===chosen.uid);if(index<0)return false;
+      const card=state.survivorRow.splice(index,1)[0];if(card.uid===state.unluckyUid)state.unluckyUid=null;p.discard.push(card);
+      logLine(state,`${p.name} chose ${defOf(card).title} from the Survivor Row.`);return finishPlayedActionCard(state,p,choice);
+    }
+    case"scouting-pick":{
+      if(!chosen)return false;const kept=choice.cards.find(card=>card.uid===chosen.uid);if(!kept)return false;
+      p.hand.push(kept);choice.cards.filter(card=>card.uid!==kept.uid).forEach(card=>trashCard(state,p,card));
+      const supplies=p.hand.filter(card=>defOf(card)?.type==="supply");
+      if(supplies.length){choice.kind="scouting-cost";choice.cards=[];choice.stage="cost";return true}
+      damage(state,p,1,defOf(choice.card).title);return finishPlayedActionCard(state,p,choice);
+    }
+    case"scouting-cost":
+      if(option==="lose-life"){damage(state,p,1,defOf(choice.card).title);return finishPlayedActionCard(state,p,choice)}
+      if(!chosen)return false;p.discard.push(removeByUid(p.hand,chosen.uid));logLine(state,`${p.name} discarded ${defOf(chosen).title} for Scouting.`);return finishPlayedActionCard(state,p,choice);
+    case"heroic-recruit":{
+      if(!chosen||p.health<3)return false;damage(state,p,3,defOf(choice.card).title);const recruited=removeByUid(p.hand,chosen.uid);if(!recruited)return false;
+      p.survivors.push(recruited);recruited.bullets=0;p.sp+=Number(defOf(recruited).sp||0);
+      if(defOf(recruited).onRecruit?.kind==="discardAll")state.players.forEach(player=>discardLowest(state,player,defOf(recruited).onRecruit.amount||1));
+      logLine(state,`${p.name} recruited ${defOf(recruited).title} with Heroic Act and gained ${defOf(recruited).sp||0} SP.`);return finishPlayedActionCard(state,p,choice);
+    }
+    case"discard-one":
+      if(!chosen)return false;p.discard.push(removeByUid(p.hand,chosen.uid));logLine(state,`${p.name} discarded ${defOf(chosen).title}.`);return finishPlayedActionCard(state,p,choice);
+    case"building-plans":{
+      if(!chosen)return false;const project=p.projects.find(item=>item.card.uid===chosen.uid&&Number(item.progress||0)>=Math.ceil(Number(item.cost||0)/2));if(!project)return false;
+      project.progress=project.cost;checkProjectComplete(state,p,project);return finishPlayedActionCard(state,p,choice);
+    }
+    case"trash-survivor":
+      if(!chosen)return false;trashCard(state,p,removeByUid(p.hand,chosen.uid));return finishPlayedActionCard(state,p,choice);
+  }
+  return false;
+}
 function applyActionCard(state,p,card){
   const d=defOf(card),a=d.action||{};if(Number(d.life||0)>0)heal(state,p,d.life);if(Number(d.life||0)<0)damage(state,p,-d.life,d.title);
   let destination="discard",target=null;
@@ -6186,20 +6307,20 @@ function applyActionCard(state,p,card){
     case"painkillers":p.actionsLeft++;drawCards(state,p,2);p.skipRefill=true;break;
     case"venture":p.actionsLeft+=2;drawCards(state,p,1);break;
     case"regroup":drawCards(state,p,Math.max(0,handLimit(p)-p.hand.length));p.actionsLeft++;break;
-    case"explore":drawCards(state,p,2);p.actionsLeft++;discardLowest(state,p,1);break;
+    case"explore":drawCards(state,p,2);p.actionsLeft++;if(!p.isBot&&p.hand.length)return beginActionChoice(state,p,card,"discard-one");discardLowest(state,p,1);break;
     case"plentiful":{const revealed=[];let found=null;while(!found){const c=drawFromMain(state);if(!c)break;if(defOf(c).type==="supply")found=c;else revealed.push(c)}if(found)p.hand.push(found);revealed.forEach(c=>trashCard(state,p,c));break}
-    case"hospitable":takeBestSurvivor(state,p,false);break;
-    case"heroicRecruit":{const survivor=p.hand.find(c=>defOf(c)?.type==="survivor"&&effectiveRecruitCost(p,defOf(c))<=2);if(survivor&&p.health>=3){damage(state,p,3,d.title);removeByUid(p.hand,survivor.uid);recruitSurvivor(state,p,survivor,[],effectiveRecruitCost(p,defOf(survivor)))}break}
-    case"scouting":{const cards=[];for(let i=0;i<3;i++){const c=drawFromMain(state);if(c)cards.push(c)}cards.sort((x,y)=>(Number(defOf(y).trade||0)+Number(defOf(y).value||0))-(Number(defOf(x).trade||0)+Number(defOf(x).value||0)));if(cards[0])p.hand.push(cards.shift());cards.forEach(c=>trashCard(state,p,c));if(!discardLowest(state,p,1,c=>defOf(c)?.type==="supply"))damage(state,p,1,d.title);break}
-    case"takeSupplyTradeDiscard":takeBestPublicCard(state,p,false,true);break;
-    case"takeSupplyTradeHand":takeBestPublicCard(state,p,true,true);break;
-    case"smuggle":takeBestPublicCard(state,p,false,false,false);break;
-    case"buildingPlans":{const project=p.projects.find(x=>x.progress>=Math.ceil(x.cost/2));if(project){project.progress=project.cost;checkProjectComplete(state,p,project)}break}
+    case"hospitable":if(!p.isBot&&state.survivorRow.length)return beginActionChoice(state,p,card,"survivor-row");takeBestSurvivor(state,p,false);break;
+    case"heroicRecruit":{const eligible=p.hand.filter(c=>defOf(c)?.type==="survivor"&&effectiveRecruitCost(p,defOf(c))<=2);if(!p.isBot&&eligible.length&&p.health>=3)return beginActionChoice(state,p,card,"heroic-recruit");const survivor=eligible[0];if(survivor&&p.health>=3){damage(state,p,3,d.title);removeByUid(p.hand,survivor.uid);p.survivors.push(survivor);survivor.bullets=0;p.sp+=Number(defOf(survivor).sp||0)}break}
+    case"scouting":{const cards=[];for(let i=0;i<3;i++){const c=drawFromMain(state);if(c)cards.push(c)}if(!p.isBot&&cards.length)return beginActionChoice(state,p,card,"scouting-pick",{cards});cards.sort((x,y)=>(Number(defOf(y).trade||0)+Number(defOf(y).value||0))-(Number(defOf(x).trade||0)+Number(defOf(x).value||0)));if(cards[0])p.hand.push(cards.shift());cards.forEach(c=>trashCard(state,p,c));if(!discardLowest(state,p,1,c=>defOf(c)?.type==="supply"))damage(state,p,1,d.title);break}
+    case"takeSupplyTradeDiscard":if(!p.isBot&&state.market.flat().some(c=>defOf(c)?.type==="supply"))return beginActionChoice(state,p,card,"trade-card",{destination:"discard",filter:"supply"});takeBestPublicCard(state,p,false,true);break;
+    case"takeSupplyTradeHand":if(!p.isBot&&state.market.flat().some(c=>defOf(c)?.type==="supply"))return beginActionChoice(state,p,card,"trade-card",{destination:"hand",filter:"supply"});takeBestPublicCard(state,p,true,true);break;
+    case"smuggle":if(!p.isBot&&state.market.flat().length)return beginActionChoice(state,p,card,"trade-card",{destination:"discard"});takeBestPublicCard(state,p,false,false,false);break;
+    case"buildingPlans":{const eligible=p.projects.filter(x=>x.progress>=Math.ceil(x.cost/2));if(!p.isBot&&eligible.length)return beginActionChoice(state,p,card,"building-plans");const project=eligible[0];if(project){project.progress=project.cost;checkProjectComplete(state,p,project)}break}
     case"recycle":takeWasteSupply(state,p);break;
     case"freshStart":p.discard.push(...p.hand.splice(0));p.deck=shuffle([...p.deck.splice(0),...p.discard.splice(0)]);drawCards(state,p,handLimit(p));break;
     case"lifeShield":p.roundLifeShield+=Number(a.amount||0);break;
     case"reloadAll":reloadAllWeapons(p);break;
-    case"trashSurvivorHand":trashLowest(state,p,1,c=>defOf(c)?.type==="survivor");break;
+    case"trashSurvivorHand":if(!p.isBot&&p.hand.some(c=>defOf(c)?.type==="survivor"))return beginActionChoice(state,p,card,"trash-survivor");trashLowest(state,p,1,c=>defOf(c)?.type==="survivor");break;
     case"armedRobbery":{drawCards(state,p,1);const opponents=state.players.filter(x=>x.id!==p.id&&x.hand.length);if(opponents.length){target=opponents[Math.floor(Math.random()*opponents.length)];const stolen=target.hand.splice(Math.floor(Math.random()*target.hand.length),1)[0];p.discard.push(stolen);destination="target-hand";logLine(state,`${p.name} robbed ${target.name}.`)}break}
   }
   logLine(state,`${p.name} played ${d.title}.`);return {destination,target};
@@ -6207,6 +6328,11 @@ function applyActionCard(state,p,card){
 function checkProjectComplete(state,p,project){const d=defOf(project.card);if(project.progress<project.cost)return false;p.projects=p.projects.filter(x=>x.id!==project.id);p.buildings.push(project.card);p.sp+=Number(d.sp||0);logLine(state,`${p.name} completed ${d.title} for ${d.sp} SP.`);return true}
 function applyGameAction(playerId,action){
   const state=app.state;if(!state||state.phase==="gameover")return false;const p=state.players.find(x=>x.id===playerId);if(!p)return false;const current=activePlayer(state);
+  if(action.type==="action-choice"){
+    if(!state.actionChoice||state.actionChoice.playerId!==playerId)return false;
+    return resolveActionChoice(state,p,String(action.cardUid||""),String(action.option||"select"));
+  }
+  if(state.actionChoice)return false;
   if(action.type==="choose-rescue"){
     if(!canChooseDeckRescue(state,p))return false;
     const chosen=state.survivorRow.find(c=>c.uid===action.cardUid);if(!chosen)return false;
@@ -6232,7 +6358,8 @@ function applyGameAction(playerId,action){
   }
   if(state.phase==="action"&&current?.id===playerId&&action.type==="use-hitman")return useHitmanAbility(state,p,action.targetPlayerId,action.targetSurvivorUid);
   if(state.phase==="action"&&current?.id===playerId&&action.type==="play-stored"){
-    const card=(p.storedActions||[]).find(c=>c.uid===action.cardUid&&Number(c.storedAtRound||0)<state.round);if(!card)return false;removeByUid(p.storedActions,card.uid);delete card.storedAtRound;const result=applyActionCard(state,p,card);
+    const card=(p.storedActions||[]).find(c=>c.uid===action.cardUid&&Number(c.storedAtRound||0)<state.round);if(!card||!actionCardPlayability(state,p,card).ok)return false;removeByUid(p.storedActions,card.uid);delete card.storedAtRound;const result=applyActionCard(state,p,card);
+    if(result?.pending){logLine(state,`${p.name} used Janitor to play the stored card for free.`);return true}
     if(result.destination==="target-hand"&&result.target)result.target.hand.push(card);else{p.discard.push(card);(p.playedActionUidsRound||(p.playedActionUidsRound=[])).push(card.uid)}logLine(state,`${p.name} used Janitor to play the stored card for free.`);return true
   }
   if(state.phase==="action"){
@@ -6240,7 +6367,9 @@ function applyGameAction(playerId,action){
     if(action.type==="buy-action"&&state.eventActionStartZero&&p.health>0){damage(state,p,1,"Surprise Attack");p.actionsLeft++;return true}
     if(action.type==="play-action"){
       if(p.actionsLeft<=0)return false;const preview=p.hand.find(c=>c.uid===action.cardUid);if(!preview||defOf(preview).type!=="action"||preview.defId==="under-fire")return false;
+      if(!actionCardPlayability(state,p,preview).ok)return false;
       const card=removeByUid(p.hand,action.cardUid);p.actionsLeft--;const result=applyActionCard(state,p,card);
+      if(result?.pending)return true;
       if(result.destination==="target-hand"&&result.target)result.target.hand.push(card);else{p.discard.push(card);(p.playedActionUidsRound||(p.playedActionUidsRound=[])).push(card.uid)}
       afterActionSpent(state,p);return true;
     }
@@ -6543,7 +6672,7 @@ async function disconnectRoom(showHome=true){
     try{await app.client.removeChannel(app.channel)}catch(_){}
   }
   app.channel=null;app.roomCode="";app.hostId=null;app.humans=[];app.started=false;app.localMode=false;app.state=null;app.messages=[];app.unread=0;app.backGuardArmed=false;
-  app.ui.selected.clear();app.ui.selectedSpecific=null;app.ui.focusCardUid=null;app.ui.eventDecisionCardUid=null;app.ui.eventDecisionSelectedUids.clear();app.ui.eventDecisionScrollLeft=0;app.ui.viewerZone=null;app.ui.viewerParentZone=null;app.ui.viewerIndex=0;app.ui.viewerZoom=1;app.ui.lastPhaseKey="";
+  app.ui.selected.clear();app.ui.selectedSpecific=null;app.ui.focusCardUid=null;app.ui.eventDecisionCardUid=null;app.ui.eventDecisionSelectedUids.clear();app.ui.eventDecisionScrollLeft=0;app.ui.actionDecisionCardUid=null;app.ui.viewerZone=null;app.ui.viewerParentZone=null;app.ui.viewerIndex=0;app.ui.viewerZoom=1;app.ui.lastPhaseKey="";
   history.replaceState({screen:"home"},"",location.pathname+location.search);
   if(showHome)showScreen("homeScreen");
 }
@@ -6675,9 +6804,14 @@ function renderLobby(){
   $("startGameButton").disabled=!isHost()||players.length>app.totalSeats;
   updateChatBadges();
 }
+function highlightedPlayer(state){
+  if(!state||state.phase==="round-ready")return null;
+  if(state.phase==="event"&&state.phaseStep!=="reveal")return activeEventDecisionPlayer(state)||activePlayer(state);
+  return activePlayer(state);
+}
 function renderPlayersStrip(state){
-  const current=state.phase==="round-ready"?null:activePlayer(state);
-  return `<div class="players-strip">${state.players.map((p,index)=>`<button type="button" class="player-board-chip${current&&current.id===p.id?" turn":""}${p.id===app.id?" me":""}" data-player-view="${p.id}" aria-label="View ${escapeHtml(p.name)} player status">
+  const current=highlightedPlayer(state);
+  return `<div class="players-strip">${state.players.map((p,index)=>`<button type="button" class="player-board-chip${current&&current.id===p.id?" turn":""}${p.id===app.id?" me":""}" data-player-view="${p.id}" data-player-id="${p.id}" aria-label="View ${escapeHtml(p.name)} player status">
     ${index===state.firstSeat?'<span class="first-player-crown" title="First player" aria-label="First player">♛</span>':""}
     <span class="pbc-portrait" style="background-image:url('${playerPortraitFor(index)}')"></span>
     <span class="pbc-body">
@@ -6767,6 +6901,21 @@ function renderQuickZones(state,p){
     ${quickZoneButton(state,p,"event","Event","⚠")}
   </div>`;
 }
+function actionCardPlayability(state,p,card){
+  const d=defOf(card),kind=d?.action?.kind;
+  if(!d||d.type!=="action")return {ok:false,reason:"Not an Action card"};
+  if(kind==="takeSupplyTradeDiscard"||kind==="takeSupplyTradeHand")return state.market.flat().some(c=>defOf(c)?.type==="supply")?{ok:true}:{ok:false,reason:"No Supply cards are available in the Trade piles"};
+  if(kind==="smuggle")return state.market.flat().length?{ok:true}:{ok:false,reason:"The Trade piles are empty"};
+  if(kind==="hospitable")return state.survivorRow.length?{ok:true}:{ok:false,reason:"The Survivor Row is empty"};
+  if(kind==="heroicRecruit"){
+    if(Number(p.health||0)<3)return {ok:false,reason:"You need at least 3 Life"};
+    return p.hand.some(c=>c.uid!==card.uid&&defOf(c)?.type==="survivor"&&effectiveRecruitCost(p,defOf(c))<=2)?{ok:true}:{ok:false,reason:"No Survivor in your hand has a Recruit cost of 2 or less"};
+  }
+  if(kind==="buildingPlans")return p.projects.some(x=>Number(x.progress||0)>=Math.ceil(Number(x.cost||0)/2))?{ok:true}:{ok:false,reason:"No Building is at least half constructed"};
+  if(kind==="recycle")return state.waste.some(c=>defOf(c)?.type==="supply")?{ok:true}:{ok:false,reason:"There is no Supply card in the Waste pile"};
+  if(kind==="trashSurvivorHand")return p.hand.some(c=>c.uid!==card.uid&&defOf(c)?.type==="survivor")?{ok:true}:{ok:false,reason:"You have no Survivor card in your hand to trash"};
+  return {ok:true};
+}
 function renderActionSelectionControl(state,p){
   const current=activePlayer(state);
   if(!p||state.phase!=="action"||current?.id!==app.id)return "";
@@ -6781,8 +6930,9 @@ function renderActionSelectionControl(state,p){
   if(ammoCard&&hasUnloaded){
     button=`<button class="workspace-action-button action-reload" data-work-act="use-ammunition" data-card="${ammoCard.uid}">DISCARD AMMUNITION • RELOAD WEAPONS</button>`;
   }else if(p.actionsLeft>0&&actionCard){
-    button=`<button class="workspace-action-button action-play" data-work-act="play-action" data-card="${actionCard.uid}">PLAY ${escapeHtml(defOf(actionCard).title).toUpperCase()}</button>`;
-    note="This plays the selected Action card and uses 1 Action.";
+    const playable=actionCardPlayability(state,p,actionCard);
+    button=`<button class="workspace-action-button action-play" data-work-act="play-action" data-card="${actionCard.uid}"${playable.ok?"":" disabled"}>${playable.ok?`PLAY ${escapeHtml(defOf(actionCard).title).toUpperCase()}`:"CANNOT PLAY THIS CARD YET"}</button>`;
+    note=playable.ok?"This plays the selected Action card and uses 1 Action.":playable.reason;
   }else if(p.actionsLeft>0&&(buildingCard||app.ui.selectedSpecific)){
     const project=app.ui.selectedSpecific?p.projects.find(x=>x.id===app.ui.selectedSpecific):null;
     const needed=project?Math.max(0,Number(project.cost||0)-Number(project.progress||0)):buildingCard?effectiveBuildingCost(p,defOf(buildingCard)):0;
@@ -6938,6 +7088,18 @@ function renderDecisionOverlay(state,p){
     const steps=remaining>1?` You still need to make ${remaining} different choices.`:"";
     return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Event decision required"><section class="event-decision-sheet"><div class="event-decision-kicker">Your decision • ${escapeHtml(p.name)}</div><h2>${escapeHtml(eventChoiceHeading(choice))}</h2><div class="event-decision-event">${escapeHtml(ev?.title||"Current Event")}</div><p class="event-decision-copy">Choose how your colony resolves this Event.${escapeHtml(steps)}</p>${preview}<div class="event-decision-buttons">${options.map((option,index)=>`<button class="event-decision-button${index===0?" primary-decision":""}" data-event-choice="${escapeHtml(option.id)}"${option.disabled?" disabled":""}>${escapeHtml(option.label)}</button>`).join("")}</div><div class="event-decision-no-close">This decision stays open until you choose. Other players are waiting.</div></section></div>`;
   }
+  const actionChoice=state.actionChoice;
+  if(state.phase==="action"&&actionChoice?.playerId===p.id){
+    const cards=actionChoiceCards(state,p,actionChoice),available=new Set(cards.map(card=>card.uid));
+    if(app.ui.actionDecisionCardUid&&!available.has(app.ui.actionDecisionCardUid))app.ui.actionDecisionCardUid=null;
+    const selected=app.ui.actionDecisionCardUid,selectedCard=cards.find(card=>card.uid===selected)||null;
+    const labels={"trade-card":"Choose a card from the Trade piles","survivor-row":"Choose a Survivor","scouting-pick":"Choose 1 of the 3 revealed cards","scouting-cost":"Discard a Supply or lose 1 Life","heroic-recruit":"Choose a Survivor to recruit","discard-one":"Choose a card to discard","building-plans":"Choose a Building to complete","trash-survivor":"Choose a Survivor card to trash"};
+    const details={"trade-card":actionChoice.filter==="supply"?"Select the exact Supply card you want.":"Select the exact card you want.","survivor-row":"The chosen Survivor goes to your discard pile.","scouting-pick":"The chosen card goes into your hand. The other two are trashed.","scouting-cost":"Choose a Supply to discard, or lose 1 Life.","heroic-recruit":"Pay 3 Life to recruit the selected Survivor with no Supply payment.","discard-one":"The selected card goes to your discard pile.","building-plans":"The selected half-built Building is completed immediately.","trash-survivor":"The selected Survivor card is permanently trashed."};
+    const preview=cards.length?`<div class="event-decision-card-help"><b>Tap a card to select it.</b><span>Use its <strong>i</strong> button to inspect it full-screen.</span></div><div class="event-decision-card-strip selectable">${cards.map(card=>`<div class="event-decision-card-choice${card.uid===selected?" selected":""}" data-action-card-select="${card.uid}">${cardHTML(card,{small:true,selected:card.uid===selected,context:"event-decision-select"})}</div>`).join("")}</div>`:`<div class="event-hand-empty">There are no eligible cards available.</div>`;
+    const confirmLabel=selectedCard?`Confirm • ${escapeHtml(defOf(selectedCard).title)}`:"Select a Card First";
+    const loseButton=actionChoice.kind==="scouting-cost"?`<button class="event-decision-button" data-action-choice-option="lose-life">Lose 1 Life Instead</button>`:"";
+    return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Action card decision"><section class="event-decision-sheet"><div class="event-decision-kicker">Resolve Action • ${escapeHtml(p.name)}</div><h2>${escapeHtml(labels[actionChoice.kind]||"Choose a card")}</h2><div class="event-decision-event">${escapeHtml(actionChoice.title||"Action Card")}</div><p class="event-decision-copy">${escapeHtml(details[actionChoice.kind]||"")}</p>${preview}<div class="event-decision-buttons compact-choice-actions">${loseButton}<button class="event-decision-button primary-decision" data-action-choice-confirm${selectedCard?"":" disabled"}>${confirmLabel}</button></div><div class="event-decision-no-close">This Action card will not finish until you make this choice.</div></section></div>`;
+  }
   const current=activePlayer(state);
   if(state.phase==="action"&&current?.id===p.id&&state.eventActionStartZero&&Number(p.actionsLeft||0)<=0){
     const canBuy=Number(p.health||0)>0;
@@ -6978,12 +7140,27 @@ function phaseProgressHTML(state){
   const phases=["event","action","trade","recruit","cleanup"],labels={event:"1 Event",action:"2 Action",trade:"3 Trade",recruit:"4 Recruit",cleanup:"5 Cleanup"};
   return `<div class="phase-sequence" aria-label="Round phase order">${phases.map(key=>`<span class="phase-sequence-step${state.phase===key?" active":""}">${labels[key]}</span>`).join('<b aria-hidden="true">›</b>')}</div>`;
 }
+function keepCurrentPlayerVisible(state){
+  const current=highlightedPlayer(state);
+  if(!current)return;
+  requestAnimationFrame(()=>{
+    const strip=$("gameShell")?.querySelector(".players-strip");
+    const activeChip=strip?.querySelector(`.player-board-chip[data-player-view="${CSS.escape(current.id)}"]`);
+    if(!strip||!activeChip)return;
+    const maxLeft=Math.max(0,strip.scrollWidth-strip.clientWidth);
+    const centered=activeChip.offsetLeft-(strip.clientWidth-activeChip.offsetWidth)/2;
+    const target=Math.max(0,Math.min(maxLeft,centered));
+    const changed=app.ui.lastTurnPlayerId!==current.id;
+    app.ui.lastTurnPlayerId=current.id;
+    strip.scrollTo({left:target,behavior:changed?"smooth":"auto"});
+  });
+}
 function renderGame(){
   if(!app.state||!$("gameScreen").classList.contains("active"))return;
   const state=app.state,p=myPlayer(),current=activePlayer(state);
   $("gameSubtitle").textContent=`${state.scenarioName||SCENARIO_NAMES[state.scenario]||"Scenario"} • Round ${state.round}/${state.maxRounds}`;
   $("gameTitle").textContent=state.phase==="gameover"?"The Final Count":"Edge of Humanity";
-  const phaseKey=`${state.round}:${state.phase}:${state.phaseStep}:${state.activeSeat}`;
+  const phaseKey=`${state.round}:${state.phase}:${state.phaseStep}:${state.activeSeat}:${highlightedPlayer(state)?.id||"none"}`;
   const phaseChanged=app.ui.lastPhaseKey!==phaseKey;
   app.ui.lastPhaseKey=phaseKey;
   $("gameShell").innerHTML=`
@@ -7000,16 +7177,9 @@ function renderGame(){
   bindGameInteractions();
   updateChatBadges();
   restoreFocusedHandCard();
+  keepCurrentPlayerVisible(state);
   if(phaseChanged&&!$("collectionViewer").classList.contains("open")){
     $("gameScroll").scrollTo({top:0,behavior:"smooth"});
-    requestAnimationFrame(()=>{
-      const strip=$("gameShell").querySelector(".players-strip");
-      const activeChip=strip?.querySelector(".player-board-chip.turn");
-      if(strip&&activeChip){
-        const left=activeChip.offsetLeft-(strip.clientWidth-activeChip.offsetWidth)/2;
-        strip.scrollTo({left:Math.max(0,left),behavior:"smooth"});
-      }
-    });
   }
   if($("collectionViewer").classList.contains("open"))renderCollection(app.ui.viewerZone,true);
   scheduleEventRevealTick();
@@ -7041,6 +7211,13 @@ function currentMessage(state,p){
 }
 function renderControls(state,p){
   const current=activePlayer(state),mine=current&&current.id===app.id;let buttons="";
+  if(state.actionChoice){
+    const exitButton=`<button class="danger controls-exit" data-ui="exit-game">Exit</button>`;
+    const micTitle=app.localMode?"Voice chat is available in online rooms":"Hold to talk to the room";
+    const microphone=`<div class="controls-center"><button id="voiceTalkBtn" class="voice-talk-button" type="button" aria-label="${micTitle}" title="${micTitle}">🎙️</button></div>`;
+    $("controlsInner").innerHTML=`<div class="controls-left">${exitButton}</div>${microphone}<div class="controls-right"></div>`;
+    $("controlsInner").querySelector('[data-ui="exit-game"]')?.addEventListener("click",requestLeave);wireVoiceButton();return;
+  }
   if(state.phase==="event"&&state.phaseStep!=="reveal"&&isHost()&&!hasPendingEventChoices(state))buttons=`<button class="primary" data-act="begin-action">Begin Action</button>`;
   else if(state.phase==="action"&&mine){
     buttons=`<button class="ghost turn-end-button" data-act="rest">End Action Turn</button>`;
@@ -7125,6 +7302,18 @@ function bindGameInteractions(){
       requestAction(type,{buildingUid:btn.dataset.building||null,projectId:btn.dataset.project||null,supplyUids:supplies});
     }else if(type==="discard")requestAction(type,{cardUids:[...app.ui.selected]});
   });
+  document.querySelectorAll("[data-action-card-select]").forEach(choice=>choice.onclick=e=>{
+    if(e.target.closest(".card-info"))return;e.stopPropagation();
+    const id=choice.dataset.actionCardSelect;app.ui.actionDecisionCardUid=app.ui.actionDecisionCardUid===id?null:id;
+    document.querySelectorAll("[data-action-card-select]").forEach(el=>el.classList.toggle("selected",el.dataset.actionCardSelect===app.ui.actionDecisionCardUid));
+    const confirm=document.querySelector("[data-action-choice-confirm]");
+    const card=actionChoiceCards(app.state,myPlayer(),app.state.actionChoice).find(item=>item.uid===app.ui.actionDecisionCardUid);
+    if(confirm){confirm.toggleAttribute("disabled",!card);confirm.textContent=card?`Confirm • ${defOf(card).title}`:"Select a Card First"}
+  });
+  document.querySelectorAll("[data-action-choice-confirm]").forEach(btn=>btn.onclick=e=>{
+    e.stopPropagation();const cardUid=app.ui.actionDecisionCardUid;if(!cardUid)return toast("Select a card first.");app.ui.actionDecisionCardUid=null;requestAction("action-choice",{cardUid,option:"select"});
+  });
+  document.querySelectorAll("[data-action-choice-option]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();app.ui.actionDecisionCardUid=null;requestAction("action-choice",{option:btn.dataset.actionChoiceOption})});
   document.querySelectorAll("[data-event-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();app.ui.eventDecisionCardUid=null;app.ui.eventDecisionSelectedUids.clear();requestAction("event-choice",{choiceId:btn.dataset.eventChoice})});
   document.querySelectorAll("[data-event-card-select]").forEach(choice=>choice.onclick=e=>{
     if(e.target.closest(".card-info"))return;
@@ -7211,7 +7400,7 @@ function bindGameInteractions(){
 }
 function findInst(uidValue){
   const s=app.state;if(!s)return null;
-  const zones=[s.event?[s.event]:[],s.market.flat(),s.survivorRow,s.waste||[],s.survivorWaste||[]];
+  const zones=[s.event?[s.event]:[],s.actionChoice?.card?[s.actionChoice.card]:[],s.actionChoice?.cards||[],s.market.flat(),s.survivorRow,s.waste||[],s.survivorWaste||[]];
   s.players.forEach(p=>zones.push(p.hand,p.deck,p.discard,p.survivors,p.buildings,p.equipment||[],p.storedActions||[],p.projects.map(x=>x.card)));
   for(const zone of zones){const f=zone.find?.(x=>x&&x.uid===uidValue);if(f)return f}
   return null;
@@ -7460,7 +7649,7 @@ function botChooseAction(state,p){
   if(p.actionsLeft<=0){if(state.eventActionStartZero&&p.health>1)return {type:"buy-action"};return {type:"rest"}}
   const supplies=p.hand.filter(c=>defOf(c)?.type==="supply");
   if(p.projects.length&&supplies.length){const project=p.projects[0],need=Math.max(0,project.cost-project.progress),chosen=chooseSupplyCardsForCost(p,Math.min(need,supplies.reduce((n,c)=>n+Number(defOf(c).value||0),0)));return {type:"build",projectId:project.id,supplyUids:(chosen.length?chosen:supplies.slice(0,1)).map(c=>c.uid)}}
-  const playedThisRound=new Set(p.playedActionUidsRound||[]),action=p.hand.find(c=>defOf(c)?.type==="action"&&c.defId!=="under-fire"&&c.defId!=="kevlar-vest"&&!playedThisRound.has(c.uid));if(action)return {type:"play-action",cardUid:action.uid};
+  const playedThisRound=new Set(p.playedActionUidsRound||[]),action=p.hand.find(c=>defOf(c)?.type==="action"&&c.defId!=="under-fire"&&c.defId!=="kevlar-vest"&&!playedThisRound.has(c.uid)&&actionCardPlayability(state,p,c).ok);if(action)return {type:"play-action",cardUid:action.uid};
   const building=p.hand.find(c=>defOf(c)?.type==="building");if(building&&supplies.length){const chosen=chooseSupplyCardsForCost(p,effectiveBuildingCost(p,defOf(building)));return {type:"build",buildingUid:building.uid,supplyUids:(chosen.length?chosen:supplies.slice(0,1)).map(c=>c.uid)}}
   if(p.survivors.some(c=>c.defId==="postman")&&(p.deck.length||p.discard.length||state.survivorRow.length))return {type:"use-postman"};
   const discard=p.hand.filter(c=>defOf(c)?.type!=="supply").slice(0,Math.min(2,p.hand.length)).map(c=>c.uid);return discard.length?{type:"discard",cardUids:discard}:{type:"rest"};
