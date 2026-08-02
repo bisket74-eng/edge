@@ -1065,7 +1065,7 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 .event-hand-strip{flex:1;min-height:0;display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;padding:12px 22vw 14px 5vw;scroll-padding-inline:5vw;scroll-snap-type:x mandatory;align-items:flex-start;scrollbar-width:none}
 .event-hand-strip::-webkit-scrollbar{display:none}
 .event-hand-choice{position:relative;flex:0 0 min(72vw,320px);width:min(72vw,320px);padding:4px;border:3px solid transparent;border-radius:18px;scroll-snap-align:start;transition:.14s transform,.14s border-color,.14s box-shadow}
-/* Event choices use the same tall portrait card shape as every other game card. */
+/* Only Event and Action choice popups force portrait cards. Normal board cards keep their original sizing. */
 .event-hand-choice .game-card,
 .event-decision-card-choice .game-card,
 .event-decision-card-strip>.game-card{
@@ -1284,68 +1284,26 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 }
 
 
-/* Universal portrait-card lock: no playable card is ever rendered horizontally. */
-.event-card-wide{
-  width:min(80vw,332px)!important;
-  height:auto!important;
-  min-height:0!important;
-  aspect-ratio:128/188;
-  margin:8px auto;
-  grid-template-columns:1fr!important;
-  grid-template-rows:40% 60%;
-  border-radius:18px;
+/* Compact bottom controls; keep cards clear of the fixed bar. */
+.phase-controls{padding-top:5px;gap:2px}
+#phaseControls .controls-inner{
+  grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr);
+  min-height:52px;
+  gap:5px;
+  align-items:center;
 }
-.event-card-wide .event-art{min-height:0}
-.event-card-wide .event-copy{min-height:0;overflow:auto;padding:13px 14px}
-.event-card-wide .event-copy h2{font-size:clamp(26px,7vw,34px)}
-.event-card-wide .event-copy p{font-size:clamp(14px,4vw,18px);line-height:1.35}
-.game-card{aspect-ratio:128/188}
-.phone-card-row .game-card,
-.collection-card .game-card,
-.event-hand-choice .game-card,
-.event-decision-card-choice .game-card,
-.event-decision-card-strip>.game-card,
-.action-choice-card .game-card{
-  height:auto!important;
-  aspect-ratio:128/188!important;
-  display:grid!important;
-  grid-template-rows:12% 14% 38% 23% 13%!important;
+.controls-center{width:54px;height:52px}
+.voice-talk-button{
+  width:48px;height:48px;min-height:48px!important;
+  font-size:20px;
 }
-.event-hand-choice,
-.event-decision-card-choice{
-  flex:0 0 min(72vw,320px)!important;
-  width:min(72vw,320px)!important;
+#phaseControls .controls-inner button:not(.voice-talk-button){min-height:44px}
+.game-scroll{padding-bottom:calc(88px + var(--safe-bottom))}
+@media(max-width:420px){
+  #phaseControls .controls-inner{grid-template-columns:minmax(0,1fr) 52px minmax(0,1fr);gap:4px}
+  .controls-center{width:52px;height:50px}
+  .voice-talk-button{width:46px;height:46px;min-height:46px!important;font-size:19px}
 }
-.event-decision-card-strip>.game-card{
-  flex:0 0 min(72vw,320px)!important;
-  width:min(72vw,320px)!important;
-  max-width:320px!important;
-}
-.event-hand-choice .game-card .card-title,
-.event-decision-card-choice .game-card .card-title,
-.event-decision-card-strip>.game-card .card-title{
-  font-size:clamp(21px,6vw,28px)!important;
-}
-.event-hand-choice .game-card .card-effect,
-.event-decision-card-choice .game-card .card-effect,
-.event-decision-card-strip>.game-card .card-effect{
-  padding:9px 10px!important;
-  font-size:clamp(14px,4vw,18px)!important;
-  line-height:1.2!important;
-  overflow:auto!important;
-}
-.event-hand-choice .game-card .card-kind,
-.event-decision-card-choice .game-card .card-kind,
-.event-decision-card-strip>.game-card .card-kind{font-size:12px!important}
-.event-hand-choice .game-card .card-statbar.fixed-stat-grid,
-.event-decision-card-choice .game-card .card-statbar.fixed-stat-grid,
-.event-decision-card-strip>.game-card .card-statbar.fixed-stat-grid{padding:7px 9px 9px!important;gap:7px!important}
-.event-hand-choice .game-card .card-statbar.fixed-stat-grid .card-stat,
-.event-decision-card-choice .game-card .card-statbar.fixed-stat-grid .card-stat,
-.event-decision-card-strip>.game-card .card-statbar.fixed-stat-grid .card-stat{min-height:36px!important;font-size:12px!important}
-.event-hand-choice .game-card .card-statbar.fixed-stat-grid .card-stat b,
-.event-decision-card-choice .game-card .card-statbar.fixed-stat-grid .card-stat b,
-.event-decision-card-strip>.game-card .card-statbar.fixed-stat-grid .card-stat b{font-size:18px!important}
 
 </style>
 </head>
