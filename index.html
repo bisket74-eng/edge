@@ -955,6 +955,32 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 @media(min-width:560px){
   .event-decision-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* Round-ready pause before each Event */
+.round-ready-panel{margin:12px;padding:16px;border:1px solid #8e7746;border-radius:16px;background:linear-gradient(180deg,#322b20,#171a16);text-align:center;box-shadow:inset 0 1px #fff1,0 8px 22px #0008}
+.round-ready-kicker{color:#e7ca72;font:950 10px/1 system-ui;letter-spacing:1.2px;text-transform:uppercase}
+.round-ready-panel h2{margin:7px 0 8px;color:#fff2cf;font:950 clamp(22px,6vw,30px)/1.08 system-ui;text-wrap:balance}
+.round-ready-panel p{margin:0 auto 14px;max-width:520px;color:#d4c9b5;font:650 13px/1.45 system-ui}
+.round-ready-start{width:100%;min-height:62px;border:1px solid #f0d07a;border-radius:14px;background:linear-gradient(180deg,#d4b35f,#a7792c);color:#21170a;font:1000 19px/1 system-ui;box-shadow:inset 0 1px #fff8,0 8px 22px #0009}
+.round-ready-start:active{transform:translateY(1px);filter:brightness(1.06)}
+.round-ready-wait{min-height:52px;display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid #59645a;border-radius:13px;background:#111512;color:#ddd2bd;font:850 13px/1.2 system-ui}
+.ready-hand-label{display:flex;align-items:center;justify-content:space-between;padding:7px 14px 0;color:#e7dcc7;font-size:12px}.ready-hand-label b{font-size:15px}.ready-hand-label span{opacity:.72}
+
+/* Selectable cards inside Event decisions */
+.event-decision-card-help{display:grid;gap:3px;padding:0 16px 9px;text-align:center;color:#e8ddc7;font:750 12px/1.3 system-ui}
+.event-decision-card-help b{color:#fff1c8;font-size:14px}.event-decision-card-help span{color:#bfb6a5}.event-decision-card-help strong{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;border:1px solid #ffffff55;color:#fff;font-size:11px}
+.event-decision-card-strip.selectable{padding-left:8vw;padding-right:18vw;scroll-padding-inline:8vw;align-items:flex-start}
+.event-decision-card-choice{position:relative;flex:0 0 min(68vw,255px);width:min(68vw,255px);padding:4px;border:3px solid transparent;border-radius:18px;scroll-snap-align:start;transition:.14s transform,.14s border-color,.14s box-shadow}
+.event-decision-card-choice .game-card{width:100%!important;max-width:none;pointer-events:auto!important}
+.event-decision-card-choice.selected{border-color:#f0c75d;background:#e6b94018;box-shadow:0 0 0 3px #eec34f44,0 0 26px #e0ab35aa;transform:translateY(-2px)}
+.event-decision-card-choice.selected::after{content:"SELECTED";position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:5;padding:4px 9px;border-radius:999px;background:#e5bb4d;color:#241a08;border:1px solid #fff0aa;font:1000 9px/1 system-ui;letter-spacing:.8px;box-shadow:0 3px 10px #0009}
+.event-decision-card-strip:not(.selectable) .game-card{pointer-events:none}
+.event-decision-buttons.compact-choice-actions{position:sticky;bottom:0;z-index:4;padding-top:10px;background:linear-gradient(180deg,transparent,#0d100e 18%,#0d100e)}
+@media(min-width:560px){.event-decision-buttons.compact-choice-actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Card inspection must sit above a required Event decision. */
+#collectionViewer{z-index:1400}
 </style>
 </head>
 <body>
@@ -5484,7 +5510,7 @@ const app = {
   state: null,
   messages: [],
   unread: 0,
-  ui: {selected:new Set(), selectedSpecific:null, focusCardUid:null, viewerZone:null, viewerParentZone:null, viewerIndex:0, lastPhaseKey:"", boardZoom:1, viewerZoom:1},
+  ui: {selected:new Set(), selectedSpecific:null, focusCardUid:null, eventDecisionCardUid:null, eventDecisionScrollLeft:0, viewerZone:null, viewerParentZone:null, viewerIndex:0, lastPhaseKey:"", boardZoom:1, viewerZoom:1},
   botTimer: null,
   backGuardArmed: false
 };
@@ -5660,12 +5686,12 @@ function makePlayer(info,seat,scenario){
 function createGame(playerInfos,scenario=app.scenario||1){
   scenario=Math.max(1,Math.min(3,Number(scenario)||1));
   const eventIds=buildScenarioEventIds(scenario);
-  const state={version:4,token:uid(),scenario,scenarioName:SCENARIO_NAMES[scenario],round:1,maxRounds:eventIds.length,targetSP:11,phase:"event",phaseStep:"read",firstSeat:0,activeSeat:0,event:null,
+  const state={version:5,token:uid(),scenario,scenarioName:SCENARIO_NAMES[scenario],round:1,maxRounds:eventIds.length,targetSP:11,phase:"round-ready",phaseStep:"ready",firstSeat:0,activeSeat:0,event:null,
     players:playerInfos.map((x,i)=>makePlayer(x,i,scenario)),tradeDeck:makeDeck(buildScenarioMainIds(scenario)),survivorDeck:makeDeck(buildScenarioSurvivorIds(scenario)),eventDeck:eventIds.map(makeInst),
     market:[],survivorRow:[],survivorWaste:[],unluckyUid:null,waste:[],tradeOrder:[],tradePickIndex:0,tradePenalty:0,winnerIds:[],log:[],updatedAt:Date.now(),
     roundTrashSupplyDamage:0,roundHandPenalty:0,eventActionStartZero:false,roundActionBonus:0,townSquare:false,eventChoices:{}};
   state.players.forEach(p=>drawCards(state,p,5));
-  refillSurvivors(state);markUnlucky(state);refillMarket(state);revealEvent(state);logLine(state,`${state.scenarioName} began.`);return state;
+  refillSurvivors(state);markUnlucky(state);refillMarket(state);logLine(state,`${state.scenarioName} is ready. The host will start Round 1.`);return state;
 }
 function damage(state,p,amount,reason=""){
   amount=Math.max(0,Number(amount)||0);
@@ -5972,6 +5998,12 @@ function applyEvent(state,inst){
   }
   state.players.forEach(p=>{const bonus=hasOngoing(p,"eventDiscardDraw");if(bonus&&p.hand.length){if(p.isBot){discardLowest(state,p,1);drawCards(state,p,bonus)}else queueEventChoice(state,p,{kind:"scavengerAbility"})}});
 }
+function startRound(state){
+  if(!state||state.phase!=="round-ready")return false;
+  revealEvent(state);
+  logLine(state,`Round ${state.round} started.`);
+  return true;
+}
 function revealEvent(state){
   resetRoundEventFlags(state);state.event=state.eventDeck.shift()||null;state.phase="event";state.phaseStep="read";state.activeSeat=state.firstSeat;
   if(state.event){applyEvent(state,state.event);logLine(state,`Event revealed: ${defOf(state.event).title}.`)}
@@ -6011,7 +6043,7 @@ function cleanupRound(state){
   state.players.forEach(p=>{storeJanitorActions(state,p);allColonyCards(p).forEach(inst=>{if(ongoingEntries(inst).some(x=>x.kind==="autoReload"))inst.bullets=Math.max(inst.bullets||0,1)});const unloaded=weaponCards(p).some(w=>Number(w.bullets||0)<Number(defOf(w).maxBullets||1));if(unloaded){const supply=p.hand.find(c=>defOf(c)?.type==="supply");if(supply){p.discard.push(removeByUid(p.hand,supply.uid));reloadAllWeapons(p);logLine(state,`${p.name} discarded a Supply card to reload all Weapons.`)}}p.roundBidBoost=0;p.eventBidBoost=0;p.usedMedic=false});
   const reached=state.players.some(p=>p.sp>=state.targetSP),eventsDone=state.eventDeck.length===0;if(reached||eventsDone){endGame(state);return}
   state.players.forEach(p=>{if(p.health<=0){p.health=7;logLine(state,`${p.name}'s empty Life pool was refilled to 7.`)}refillHand(state,p)});
-  state.round++;state.firstSeat=(state.firstSeat+1)%state.players.length;revealEvent(state);logLine(state,`Round ${state.round} began.`)
+  state.round++;state.firstSeat=(state.firstSeat+1)%state.players.length;state.activeSeat=state.firstSeat;state.phase="round-ready";state.phaseStep="ready";state.event=null;resetRoundEventFlags(state);logLine(state,`Round ${state.round} is ready. Waiting for the host to start it.`)
 }
 function endGame(state){
   state.phase="gameover";state.phaseStep="done";state.players.forEach(p=>{let bonus=0;p.survivors.forEach(inst=>{const eg=defOf(inst)?.endGame;if(eg?.kind==="perSurvivor")bonus+=p.survivors.filter(x=>x.defId===eg.target).length*Number(eg.amount||0)});if(bonus){p.sp+=bonus;logLine(state,`${p.name} gained ${bonus} end-game SP.`)}});
@@ -6055,6 +6087,7 @@ function applyGameAction(playerId,action){
     logLine(state,`${p.name} selected ${defOf(chosen).title} to rescue when their empty Draw deck is rebuilt.`);
     return true
   }
+  if(action.type==="start-round"){if(!isHost()||state.phase!=="round-ready")return false;return startRound(state)}
   if(action.type==="event-choice"){if(state.phase!=="event"||activeEventDecisionPlayer(state)?.id!==playerId)return false;return resolveEventChoice(state,p,String(action.choiceId||""))}
   if(action.type==="begin-action"){if(!isHost()||state.phase!=="event"||hasPendingEventChoices(state))return false;return beginActionPhase(state)}
   if(action.type==="restart"){if(!isHost())return false;app.state=createGame(state.players.map(x=>({id:x.id,name:x.name,isBot:x.isBot})),state.scenario);return true}
@@ -6361,7 +6394,7 @@ async function disconnectRoom(showHome=true){
     try{await app.client.removeChannel(app.channel)}catch(_){}
   }
   app.channel=null;app.roomCode="";app.hostId=null;app.humans=[];app.started=false;app.localMode=false;app.state=null;app.messages=[];app.unread=0;app.backGuardArmed=false;
-  app.ui.selected.clear();app.ui.selectedSpecific=null;app.ui.focusCardUid=null;app.ui.viewerZone=null;app.ui.viewerParentZone=null;app.ui.viewerIndex=0;app.ui.viewerZoom=1;app.ui.lastPhaseKey="";
+  app.ui.selected.clear();app.ui.selectedSpecific=null;app.ui.focusCardUid=null;app.ui.eventDecisionCardUid=null;app.ui.eventDecisionScrollLeft=0;app.ui.viewerZone=null;app.ui.viewerParentZone=null;app.ui.viewerIndex=0;app.ui.viewerZoom=1;app.ui.lastPhaseKey="";
   history.replaceState({screen:"home"},"",location.pathname+location.search);
   if(showHome)showScreen("homeScreen");
 }
@@ -6494,7 +6527,7 @@ function renderLobby(){
   updateChatBadges();
 }
 function renderPlayersStrip(state){
-  const current=activePlayer(state);
+  const current=state.phase==="round-ready"?null:activePlayer(state);
   return `<div class="players-strip">${state.players.map((p,index)=>`<button type="button" class="player-board-chip${current&&current.id===p.id?" turn":""}${p.id===app.id?" me":""}" data-player-view="${p.id}" aria-label="View ${escapeHtml(p.name)} player status">
     ${index===state.firstSeat?'<span class="first-player-crown" title="First player" aria-label="First player">♛</span>':""}
     <span class="pbc-portrait" style="background-image:url('${playerPortraitFor(index)}')"></span>
@@ -6554,7 +6587,7 @@ function renderLog(state){
   return `<div class="board-panel full"><div class="section-head"><b>Camp Log</b><span>Newest first</span></div><div class="log-panel">${state.log.map(x=>`<div class="log-line">${escapeHtml(x.text)}</div>`).join("")}</div></div>`;
 }
 function phaseLabel(state){
-  const map={event:"Event",action:"Action",trade:"Trade",recruit:"Recruit",cleanup:"Cleanup",gameover:"Game Over"};return map[state.phase]||state.phase;
+  const map={"round-ready":"Round Ready",event:"Event",action:"Action",trade:"Trade",recruit:"Recruit",cleanup:"Cleanup",gameover:"Game Over"};return map[state.phase]||state.phase;
 }
 function zoneCount(state,p,zone){
   if(zone==="event")return state.event?1:0;
@@ -6600,6 +6633,13 @@ function renderTradeWorkspace(state){
       <div class="phone-card-row">${pile.map(c=>cardHTML(c,{locked:!canPick,context:"market"})).join("")||'<div class="phone-empty">This pile is empty.</div>'}</div>
       ${canPick?`<button class="trade-pick-button" data-pile-choice="${i}">Choose Pile ${i+1}</button>`:""}
     </section>`).join("")}</div>`;
+}
+function renderRoundReadyWorkspace(state,p){
+  const hostCopy=isHost()?`<button class="round-ready-start" data-start-round>Start Round ${state.round}</button>`:`<div class="round-ready-wait"><span class="pulse"></span> Waiting for the host to start Round ${state.round}</div>`;
+  return `<div class="phase-workspace-head"><b>Round ${state.round} Ready</b><span>Review the table before the Event begins</span></div>
+    <section class="round-ready-panel"><div class="round-ready-kicker">Everyone is seated</div><h2>Take a look before the round starts</h2><p>Review your hand, the other players, the Trade piles, and the face-up Survivors. The Event will not appear until the host starts the round.</p>${hostCopy}</section>
+    <div class="ready-hand-label"><b>Your Hand</b><span>${p?.hand.length||0} cards</span></div>
+    <div class="phone-card-row">${p?.hand.map(c=>cardHTML(c,{context:"ready-hand"})).join("")||'<div class="phone-empty">Your hand is empty.</div>'}</div>`;
 }
 function renderGameOverWorkspace(state){
   return `<div class="phase-workspace-head"><b>Final Survival Count</b><span>Highest Survival Points wins</span></div>
@@ -6664,6 +6704,15 @@ function renderDecisionOverlay(state,p){
     if(!choice)return"";
     const remaining=Number(choice.remaining||1);
     const cards=eventChoicePreviewCards(state,p,choice);
+    if(choice.kind==="dangerousGamble"){
+      const available=new Set(cards.map(card=>card.uid));
+      if(app.ui.eventDecisionCardUid&&!available.has(app.ui.eventDecisionCardUid))app.ui.eventDecisionCardUid=null;
+      const selected=app.ui.eventDecisionCardUid;
+      const selectedCard=cards.find(card=>card.uid===selected)||null;
+      const preview=`<div class="event-decision-card-help"><b>Tap a card to select it.</b><span>Tap its <strong>i</strong> button to inspect it full-screen and pinch-zoom.</span></div><div class="event-decision-card-strip selectable">${cards.map(card=>`<div class="event-decision-card-choice${card.uid===selected?" selected":""}" data-event-card-select="${card.uid}">${cardHTML(card,{small:true,selected:card.uid===selected,context:"event-decision-select"})}</div>`).join("")}</div>`;
+      const takeLabel=selectedCard?`Lose 2 Life • Take ${escapeHtml(defOf(selectedCard).title)}`:"Select a Card First";
+      return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Dangerous Gamble decision"><section class="event-decision-sheet"><div class="event-decision-kicker">Your decision • ${escapeHtml(p.name)}</div><h2>Take a card or decline</h2><div class="event-decision-event">${escapeHtml(ev?.title||"Dangerous Gamble")}</div><p class="event-decision-copy">Inspect the available cards, select one, then decide whether it is worth losing 2 Life.</p>${preview}<div class="event-decision-buttons compact-choice-actions"><button class="event-decision-button" data-event-choice="decline">Do Not Take a Card</button><button class="event-decision-button primary-decision" data-event-take-selected${selectedCard?"":" disabled"}>${takeLabel}</button></div><div class="event-decision-no-close">Only your phone shows this decision right now. Other players are waiting.</div></section></div>`;
+    }
     const preview=cards.length?`<div class="event-decision-card-strip">${cards.map(card=>cardHTML(card,{small:true,locked:true,context:"event-decision"})).join("")}</div>`:"";
     const steps=remaining>1?` You still need to make ${remaining} different choices.`:"";
     return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Event decision required"><section class="event-decision-sheet"><div class="event-decision-kicker">Your decision • ${escapeHtml(p.name)}</div><h2>${escapeHtml(eventChoiceHeading(choice))}</h2><div class="event-decision-event">${escapeHtml(ev?.title||"Current Event")}</div><p class="event-decision-copy">Choose how your colony resolves this Event.${escapeHtml(steps)}</p>${preview}<div class="event-decision-buttons">${options.map((option,index)=>`<button class="event-decision-button${index===0?" primary-decision":""}" data-event-choice="${escapeHtml(option.id)}"${option.disabled?" disabled":""}>${escapeHtml(option.label)}</button>`).join("")}</div><div class="event-decision-no-close">This decision stays open until you choose. Other players are waiting.</div></section></div>`;
@@ -6677,6 +6726,7 @@ function renderDecisionOverlay(state,p){
 }
 function renderPhaseWorkspace(state,p){
   const ev=defOf(state.event);
+  if(state.phase==="round-ready")return renderRoundReadyWorkspace(state,p);
   if(state.phase==="gameover")return renderGameOverWorkspace(state);
   if(state.phase==="trade"&&state.phaseStep==="choose")return renderTradeWorkspace(state);
   if(state.phase==="action"){
@@ -6746,6 +6796,7 @@ function renderGame(){
 }
 function currentMessage(state,p){
   const current=activePlayer(state);
+  if(state.phase==="round-ready")return isHost()?`Review the table, then press Start Round ${state.round}.`:`Waiting for the host to start Round ${state.round}.`;
   if(state.phase==="event"){
     const peek=p&&hasOngoing(p,"peekEvent")&&state.eventDeck[0]?` Next Event: ${defOf(state.eventDeck[0]).title}.`:"";
     const deciding=activeEventDecisionPlayer(state);
@@ -6846,7 +6897,25 @@ function bindGameInteractions(){
   document.querySelectorAll("[data-player-view]").forEach(btn=>btn.onclick=()=>openCollection(`player:${btn.dataset.playerView}`,0));
   document.querySelectorAll("[data-open-card]").forEach(el=>el.onclick=()=>{if(el.dataset.openCard)openCard(el.dataset.openCard)});
   document.querySelectorAll("[data-pile-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("pick-trade",{pileIndex:Number(btn.dataset.pileChoice)})});
-  document.querySelectorAll("[data-event-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("event-choice",{choiceId:btn.dataset.eventChoice})});
+  document.querySelectorAll("[data-start-round]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("start-round")});
+  document.querySelectorAll("[data-event-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();app.ui.eventDecisionCardUid=null;requestAction("event-choice",{choiceId:btn.dataset.eventChoice})});
+  document.querySelectorAll("[data-event-card-select]").forEach(choice=>choice.onclick=e=>{
+    if(e.target.closest(".card-info"))return;
+    e.stopPropagation();
+    const strip=choice.closest(".event-decision-card-strip");
+    app.ui.eventDecisionScrollLeft=strip?.scrollLeft||0;
+    const id=choice.dataset.eventCardSelect;
+    app.ui.eventDecisionCardUid=app.ui.eventDecisionCardUid===id?null:id;
+    renderGame();
+    requestAnimationFrame(()=>{const next=document.querySelector(".event-decision-card-strip.selectable");if(next)next.scrollLeft=app.ui.eventDecisionScrollLeft||0});
+  });
+  document.querySelectorAll("[data-event-take-selected]").forEach(btn=>btn.onclick=e=>{
+    e.stopPropagation();
+    const id=app.ui.eventDecisionCardUid;
+    if(!id)return toast("Select a card first.");
+    app.ui.eventDecisionCardUid=null;
+    requestAction("event-choice",{choiceId:`take:${id}`});
+  });
   document.querySelectorAll("[data-decision-act]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction(btn.dataset.decisionAct)});
   document.querySelectorAll(".card-info").forEach(btn=>btn.onclick=e=>{e.stopPropagation();openCard(btn.dataset.info)});
   document.querySelectorAll('.game-card[data-context="hand"]').forEach(card=>card.onclick=e=>{
@@ -6859,7 +6928,7 @@ function bindGameInteractions(){
     if(result.allowed)toast(result.selected?`${defOf(inst).title} selected`:"Selection cleared");
     else toast("That card cannot be selected in this phase");
   });
-  document.querySelectorAll('.game-card:not([data-context="hand"])').forEach(card=>card.onclick=e=>{
+  document.querySelectorAll('.game-card:not([data-context="hand"]):not([data-context="event-decision-select"])').forEach(card=>card.onclick=e=>{
     if(e.target.closest(".card-info"))return;
     e.stopPropagation();
     openCard(card.dataset.card);
