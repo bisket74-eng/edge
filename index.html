@@ -981,6 +981,37 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 
 /* Card inspection must sit above a required Event decision. */
 #collectionViewer{z-index:1400}
+
+/* Shared 10-second Event reveal before any player decisions */
+.event-reveal-shade{
+  position:fixed;inset:0;z-index:1180;display:grid;place-items:center;
+  padding:calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 18px);
+  background:radial-gradient(circle at 50% 22%,#4b3b1c66,#070908f2 58%,#020302fa);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.event-reveal-sheet{
+  width:min(94vw,620px);height:min(calc(100dvh - 32px),900px);max-height:calc(100dvh - 32px);
+  overflow:hidden;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;gap:8px;justify-items:center
+}
+.event-reveal-kicker{color:#f2ce67;font:1000 11px/1 system-ui;letter-spacing:1.5px;text-transform:uppercase;text-align:center}
+.event-reveal-title{margin:0;color:#fff2ca;font:1000 clamp(25px,7vw,40px)/1.03 system-ui;text-align:center;text-wrap:balance}
+.event-reveal-card{width:min(82vw,380px);height:100%;min-height:0;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;padding:2px 4px 8px}
+.event-reveal-card .game-card{width:100%!important;max-width:none!important;box-shadow:0 0 0 2px #d7b95f,0 18px 46px #000d;pointer-events:none}
+.event-reveal-summary{
+  width:min(100%,570px);padding:10px 13px 11px;border:2px solid #d8b85e;border-radius:14px;
+  background:linear-gradient(180deg,#44361d,#221d13);box-shadow:inset 0 1px #fff2,0 8px 24px #000b;text-align:center
+}
+.event-reveal-summary-label{color:#e9c85f;font:1000 10px/1 system-ui;letter-spacing:1.25px;text-transform:uppercase;margin-bottom:6px}
+.event-reveal-summary-copy{color:#fff3d2;font:1000 clamp(15px,4.2vw,19px)/1.25 system-ui;text-wrap:balance}
+.event-reveal-summary-choice{display:grid;gap:5px;margin-top:2px}
+.event-reveal-summary-choice b{color:#fff0bf;font:1000 16px/1.15 system-ui;text-transform:uppercase}
+.event-reveal-summary-choice span{display:block;padding:5px 8px;border-radius:8px;background:#11140f;border:1px solid #75633c;color:#fff2d0;font:950 14px/1.22 system-ui}
+.event-reveal-countdown{display:grid;gap:4px;justify-items:center;padding:8px 17px;border:1px solid #d6b760;border-radius:999px;background:#131711e8;color:#e8deca;font:800 13px/1.15 system-ui;text-align:center;box-shadow:0 6px 22px #0009}
+.event-reveal-countdown strong{color:#ffd969;font-size:19px}.event-reveal-countdown span{color:#bdb4a5;font-size:11px}
+@media(max-height:720px){
+  .event-reveal-sheet{gap:6px}.event-reveal-title{font-size:26px}.event-reveal-card{width:min(70vw,310px)}
+  .event-reveal-summary{padding:8px 10px}.event-reveal-summary-copy{font-size:14px}.event-reveal-countdown{padding:6px 12px}
+}
 </style>
 </head>
 <body>
@@ -5512,6 +5543,7 @@ const app = {
   unread: 0,
   ui: {selected:new Set(), selectedSpecific:null, focusCardUid:null, eventDecisionCardUid:null, eventDecisionScrollLeft:0, viewerZone:null, viewerParentZone:null, viewerIndex:0, lastPhaseKey:"", boardZoom:1, viewerZoom:1},
   botTimer: null,
+  eventRevealTimer: null,
   backGuardArmed: false
 };
 localStorage.setItem("humanity_player_id", app.id);
@@ -5786,7 +5818,7 @@ function pendingEventPlayerNames(state){
   return state.players.filter(p=>currentEventChoice(state,p)).map(p=>p.name);
 }
 function activeEventDecisionPlayer(state){
-  if(!state||state.phase!=="event")return null;
+  if(!state||state.phase!=="event"||state.phaseStep==="reveal")return null;
   const order=seatOrder(state);
   for(const seat of order){
     const player=state.players[seat];
@@ -6001,12 +6033,27 @@ function applyEvent(state,inst){
 function startRound(state){
   if(!state||state.phase!=="round-ready")return false;
   revealEvent(state);
-  logLine(state,`Round ${state.round} started.`);
+  logLine(state,`Round ${state.round} started. Everyone has 10 seconds to read the Event.`);
   return true;
 }
 function revealEvent(state){
-  resetRoundEventFlags(state);state.event=state.eventDeck.shift()||null;state.phase="event";state.phaseStep="read";state.activeSeat=state.firstSeat;
-  if(state.event){applyEvent(state,state.event);logLine(state,`Event revealed: ${defOf(state.event).title}.`)}
+  resetRoundEventFlags(state);
+  state.event=state.eventDeck.shift()||null;
+  state.phase="event";
+  state.phaseStep="reveal";
+  state.activeSeat=state.firstSeat;
+  state.eventRevealUntil=Date.now()+10000;
+  if(state.event)logLine(state,`Event revealed: ${defOf(state.event).title}.`);
+}
+function finishEventReveal(state){
+  if(!state||state.phase!=="event"||state.phaseStep!=="reveal")return false;
+  state.phaseStep="decisions";
+  state.eventRevealUntil=0;
+  if(state.event)applyEvent(state,state.event);
+  const first=activeEventDecisionPlayer(state);
+  if(first)logLine(state,`${first.name} resolves the Event first.`);
+  else logLine(state,"The Event has been resolved. The Action phase can begin.");
+  return true;
 }
 function beginActionPhase(state){
   if(hasPendingEventChoices(state))return false;
@@ -6088,8 +6135,9 @@ function applyGameAction(playerId,action){
     return true
   }
   if(action.type==="start-round"){if(!isHost()||state.phase!=="round-ready")return false;return startRound(state)}
-  if(action.type==="event-choice"){if(state.phase!=="event"||activeEventDecisionPlayer(state)?.id!==playerId)return false;return resolveEventChoice(state,p,String(action.choiceId||""))}
-  if(action.type==="begin-action"){if(!isHost()||state.phase!=="event"||hasPendingEventChoices(state))return false;return beginActionPhase(state)}
+  if(action.type==="finish-event-reveal"){if(!isHost()||state.phase!=="event"||state.phaseStep!=="reveal")return false;return finishEventReveal(state)}
+  if(action.type==="event-choice"){if(state.phase!=="event"||state.phaseStep==="reveal"||activeEventDecisionPlayer(state)?.id!==playerId)return false;return resolveEventChoice(state,p,String(action.choiceId||""))}
+  if(action.type==="begin-action"){if(!isHost()||state.phase!=="event"||state.phaseStep==="reveal"||hasPendingEventChoices(state))return false;return beginActionPhase(state)}
   if(action.type==="restart"){if(!isHost())return false;app.state=createGame(state.players.map(x=>({id:x.id,name:x.name,isBot:x.isBot})),state.scenario);return true}
   if(action.type==="use-ammunition"){
     const ammo=p.hand.find(c=>c.uid===action.cardUid&&c.defId==="ammunition")||p.hand.find(c=>c.defId==="ammunition");if(!ammo||!weaponCards(p).some(w=>Number(w.bullets||0)<Number(defOf(w).maxBullets||1)))return false;
@@ -6343,6 +6391,26 @@ function wireVoiceButton(){
   btn.onpointerdown=beginPushToTalk;btn.onpointerup=endPushToTalk;btn.onpointercancel=endPushToTalk;btn.onlostpointercapture=endPushToTalk;btn.oncontextmenu=event=>event.preventDefault();
 }
 
+function clearEventRevealTimer(){
+  clearTimeout(app.eventRevealTimer);
+  app.eventRevealTimer=null;
+}
+function scheduleEventRevealTick(){
+  clearEventRevealTimer();
+  const state=app.state;
+  if(!state||state.phase!=="event"||state.phaseStep!=="reveal")return;
+  const remaining=Math.max(0,Number(state.eventRevealUntil||0)-Date.now());
+  const token=state.token,round=state.round,eventUid=state.event?.uid||"";
+  app.eventRevealTimer=setTimeout(()=>{
+    app.eventRevealTimer=null;
+    const current=app.state;
+    if(!current||current.token!==token||current.round!==round||current.event?.uid!==eventUid||current.phase!=="event"||current.phaseStep!=="reveal")return;
+    if(Date.now()>=Number(current.eventRevealUntil||0)){
+      if(isHost()&&applyGameAction(app.id,{type:"finish-event-reveal"}))broadcastState();
+      else renderGame();
+    }else renderGame();
+  },Math.max(120,Math.min(1000,remaining+40)));
+}
 function broadcastState(){
   if(!isHost()||!app.state)return;
   app.state.updatedAt=Date.now();
@@ -6388,6 +6456,7 @@ async function disconnectRoom(showHome=true){
   closeModals();
   closeChat();
   clearTimeout(app.botTimer);
+  clearEventRevealTimer();
   await stopVoiceRoom(true);
   if(app.channel){
     try{await app.channel.untrack()}catch(_){}
@@ -6696,8 +6765,25 @@ function renderEventChoicePanel(state,p){
   if(active.id===p?.id)return `<div class="event-choice-wait">Your Event decision is ready.</div>`;
   return `<div class="event-choice-wait">Waiting for ${escapeHtml(active.name)} to resolve the Event.</div>`;
 }
+function eventRevealSummaryHTML(ev){
+  const effect=String(ev?.effect||"Read the Event card.").trim();
+  const choice=effect.match(/^Choose\s+(one|two):\s*(.+)$/i);
+  if(choice){
+    const amount=choice[1].toLowerCase()==="one"?"Choose one":"Choose two";
+    const items=choice[2].split(/\s*;\s*/).map(item=>item.trim().replace(/[.]$/,"" )).filter(Boolean);
+    return `<div class="event-reveal-summary"><div class="event-reveal-summary-label">What you must decide</div><div class="event-reveal-summary-choice"><b>${amount}</b>${items.map(item=>`<span>${escapeHtml(item)}</span>`).join("")}</div></div>`;
+  }
+  return `<div class="event-reveal-summary"><div class="event-reveal-summary-label">What happens this round</div><div class="event-reveal-summary-copy">${escapeHtml(effect)}</div></div>`;
+}
+function renderEventRevealOverlay(state){
+  if(!state||state.phase!=="event"||state.phaseStep!=="reveal"||!state.event)return"";
+  const ev=defOf(state.event),remaining=Math.max(0,Math.ceil((Number(state.eventRevealUntil||0)-Date.now())/1000));
+  const message=remaining>0?`${remaining} second${remaining===1?"":"s"}`:"Preparing Player 1's decision…";
+  return `<div class="event-reveal-shade" role="dialog" aria-modal="true" aria-label="Event reveal"><section class="event-reveal-sheet"><div class="event-reveal-kicker">Round ${state.round} • Everyone Read</div><h2 class="event-reveal-title">${escapeHtml(ev?.title||"Current Event")}</h2><div class="event-reveal-card">${cardHTML(state.event,{context:"event-reveal",locked:true})}</div>${eventRevealSummaryHTML(ev)}<div class="event-reveal-countdown"><strong data-event-reveal-count>${escapeHtml(message)}</strong><span>Player 1's decision begins after the reveal.</span></div></section></div>`;
+}
 function renderDecisionOverlay(state,p){
   if(!state||!p)return"";
+  if(state.phase==="event"&&state.phaseStep==="reveal")return renderEventRevealOverlay(state);
   const eventPlayer=activeEventDecisionPlayer(state);
   if(state.phase==="event"&&eventPlayer?.id===p.id){
     const choice=currentEventChoice(state,p),options=eventChoiceOptions(state,p,choice),ev=defOf(state.event);
@@ -6791,6 +6877,7 @@ function renderGame(){
     });
   }
   if($("collectionViewer").classList.contains("open"))renderCollection(app.ui.viewerZone,true);
+  scheduleEventRevealTick();
   maybeRunBots();
   if(!app.localMode)startVoiceRoom().catch(error=>console.warn("Voice room did not start",error));
 }
@@ -6799,6 +6886,10 @@ function currentMessage(state,p){
   if(state.phase==="round-ready")return isHost()?`Review the table, then press Start Round ${state.round}.`:`Waiting for the host to start Round ${state.round}.`;
   if(state.phase==="event"){
     const peek=p&&hasOngoing(p,"peekEvent")&&state.eventDeck[0]?` Next Event: ${defOf(state.eventDeck[0]).title}.`:"";
+    if(state.phaseStep==="reveal"){
+      const seconds=Math.max(0,Math.ceil((Number(state.eventRevealUntil||0)-Date.now())/1000));
+      return seconds>0?`Everyone is reading the Event. Decisions begin in ${seconds} second${seconds===1?"":"s"}.`:`Preparing the first player's decision…`;
+    }
     const deciding=activeEventDecisionPlayer(state);
     if(deciding){
       if(deciding.id===p?.id)return "Your Event decision is ready."+peek;
@@ -6815,7 +6906,7 @@ function currentMessage(state,p){
 }
 function renderControls(state,p){
   const current=activePlayer(state),mine=current&&current.id===app.id;let buttons="";
-  if(state.phase==="event"&&isHost()&&!hasPendingEventChoices(state))buttons=`<button class="primary" data-act="begin-action">Begin Action</button>`;
+  if(state.phase==="event"&&state.phaseStep!=="reveal"&&isHost()&&!hasPendingEventChoices(state))buttons=`<button class="primary" data-act="begin-action">Begin Action</button>`;
   else if(state.phase==="action"&&mine){
     const selected=[...app.ui.selected].map(id=>p.hand.find(c=>c.uid===id)).filter(Boolean),actionCard=selected.find(c=>defOf(c).type==="action"),buildingCard=selected.find(c=>defOf(c).type==="building"),ammoCard=selected.find(c=>c.defId==="ammunition"),supplies=selected.filter(c=>defOf(c).type==="supply"),supplyValue=supplies.reduce((n,c)=>n+Number(defOf(c).value||0),0),hasUnloaded=weaponCards(p).some(w=>Number(w.bullets||0)<Number(defOf(w).maxBullets||1));
     if(ammoCard&&hasUnloaded)buttons+=`<button class="primary" data-act="use-ammunition" data-card="${ammoCard.uid}">Discard Ammunition • Reload</button>`;
@@ -7221,7 +7312,7 @@ const BOT_STEP_DELAY_MS=5000;
 const SYSTEM_STEP_DELAY_MS=900;
 function maybeRunBots(){
   if(!isHost()||!app.state||app.botTimer)return;const state=app.state;let bot=null,action=null;
-  if(state.phase==="event"&&app.localMode){action={type:"begin-action"};bot={id:app.id}}
+  if(state.phase==="event"&&state.phaseStep!=="reveal"&&app.localMode&&!hasPendingEventChoices(state)){action={type:"begin-action"};bot={id:app.id}}
   else if(state.phase==="action"){bot=activePlayer(state);if(bot?.isBot)action=botChooseAction(state,bot)}
   else if(state.phase==="trade"&&state.phaseStep==="bid"){bot=state.players.find(p=>p.isBot&&!p.bidSubmitted);if(bot)action=botBid(state,bot)}
   else if(state.phase==="trade"&&state.phaseStep==="choose"){bot=activePlayer(state);if(bot?.isBot){const choices=state.market.map((pile,i)=>({i,value:pile.reduce((n,c)=>n+Number(defOf(c).trade||0)+Number(defOf(c).sp||0)+Number(defOf(c).value||0),0)})).sort((a,b)=>b.value-a.value);action={type:"pick-trade",pileIndex:choices[0]?.i||0}}}
