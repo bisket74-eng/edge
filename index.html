@@ -1012,6 +1012,52 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
   .event-reveal-sheet{gap:6px}.event-reveal-title{font-size:26px}.event-reveal-card{width:min(70vw,310px)}
   .event-reveal-summary{padding:8px 10px}.event-reveal-summary-copy{font-size:14px}.event-reveal-countdown{padding:6px 12px}
 }
+
+
+/* Full-screen vertical Event reading and hand-aware decisions */
+.event-reveal-shade{padding:0;place-items:stretch;background:#030503f8}
+.event-reveal-sheet.vertical-event-sheet{
+  width:100vw;height:100dvh;max-height:none;display:grid;grid-template-rows:auto minmax(180px,34dvh) minmax(0,1fr) auto;
+  gap:0;overflow:hidden;background:linear-gradient(180deg,#17140d,#090b09 48%,#030403);justify-items:stretch
+}
+.vertical-event-sheet .event-reveal-kicker{padding:calc(env(safe-area-inset-top) + 14px) 16px 12px;background:#0b0d0b;color:#f1ce67;font-size:13px}
+.event-reveal-hero{position:relative;background-size:cover;background-position:center;min-height:180px;border-block:1px solid #8c7440;box-shadow:inset 0 -40px 65px #050605}
+.event-reveal-hero span{position:absolute;left:18px;bottom:14px;padding:7px 12px;border:1px solid #d1ad55;border-radius:999px;background:#090b09d9;color:#f3d36f;font:1000 12px/1 system-ui;letter-spacing:1px}
+.event-reveal-reading{min-height:0;overflow:auto;padding:16px 18px 20px;overscroll-behavior:contain;display:grid;align-content:start;gap:10px}
+.event-reveal-tags{color:#b8aa90;font:900 11px/1.2 system-ui;letter-spacing:1.2px;text-align:center}
+.vertical-event-sheet .event-reveal-title{font-size:clamp(34px,10vw,54px);line-height:1;padding:0 6px}
+.vertical-event-sheet .event-reveal-summary{width:100%;padding:16px;border-width:2px;border-radius:16px;background:linear-gradient(180deg,#4d3d20,#211b10)}
+.vertical-event-sheet .event-reveal-summary-label{font-size:13px;margin-bottom:9px}
+.vertical-event-sheet .event-reveal-summary-copy{font-size:clamp(23px,6.4vw,34px);line-height:1.22}
+.vertical-event-sheet .event-reveal-summary-choice b{font-size:22px}
+.vertical-event-sheet .event-reveal-summary-choice span{padding:10px 12px;font-size:clamp(19px,5vw,25px);line-height:1.22}
+.vertical-event-sheet .event-reveal-countdown{margin:0;border-radius:0;border-inline:0;border-bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom) + 12px);background:#0d110e;box-shadow:0 -8px 24px #000b}
+.vertical-event-sheet .event-reveal-countdown strong{font-size:24px}
+.vertical-event-sheet .event-reveal-countdown span{font-size:13px}
+
+.event-decision-shade{align-items:stretch;padding:0;background:#020302fa}
+.event-decision-sheet{width:100vw;height:100dvh;max-height:none;border:0;border-radius:0;display:flex;flex-direction:column;padding-top:calc(env(safe-area-inset-top) + 8px);background:linear-gradient(180deg,#342b19 0,#11130f 26%,#050705 100%)}
+.event-decision-sheet h2{font-size:clamp(30px,8.5vw,46px)}
+.event-decision-effect-large{margin:0 14px 10px;padding:13px 15px;border:2px solid #b89549;border-radius:14px;background:#0e120f;color:#fff1cb;font:950 clamp(18px,5vw,24px)/1.28 system-ui;text-align:center}
+.event-hand-decision-sheet{overflow:hidden}
+.event-hand-status{display:grid;gap:5px;margin:0 14px 8px;padding:11px 13px;border:1px solid #84714b;border-radius:12px;background:#211e16;color:#f0e3c6;text-align:center}
+.event-hand-status b{font:900 16px/1.25 system-ui}.event-hand-status span{font:800 14px/1.25 system-ui}.event-hand-status strong{color:#ffcf61;font-size:18px}
+.event-hand-help{padding:0 16px 8px;color:#bdb5a5;font:750 12px/1.3 system-ui;text-align:center}
+.event-hand-strip{flex:1;min-height:0;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:4px 16vw 12px 7vw;scroll-padding-inline:7vw;scroll-snap-type:x mandatory;align-items:center;scrollbar-width:none}
+.event-hand-strip::-webkit-scrollbar{display:none}
+.event-hand-choice{position:relative;flex:0 0 min(72vw,300px);width:min(72vw,300px);padding:4px;border:3px solid transparent;border-radius:18px;scroll-snap-align:start;transition:.14s transform,.14s border-color,.14s box-shadow}
+.event-hand-choice .game-card{width:100%!important;max-width:none!important;pointer-events:auto!important}
+.event-hand-choice.selected{border-color:#f0c75d;background:#e6b94018;box-shadow:0 0 0 4px #eec34f44,0 0 30px #e0ab35aa;transform:translateY(-3px)}
+.event-hand-choice.selected::after{content:"SELECTED";position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:5;padding:5px 10px;border-radius:999px;background:#e5bb4d;color:#241a08;border:1px solid #fff0aa;font:1000 10px/1 system-ui;letter-spacing:.8px;box-shadow:0 3px 10px #0009}
+.event-hand-empty{flex:1;display:grid;place-items:center;margin:12px 18px;padding:20px;border:1px dashed #73694f;border-radius:15px;color:#cfc5b1;text-align:center}
+.event-hand-decision-sheet .compact-choice-actions{flex:0 0 auto;padding:10px 14px calc(env(safe-area-inset-bottom) + 10px);background:#080a08eF}
+.event-hand-decision-sheet .event-decision-no-close{padding:5px 15px 8px;background:#080a08}
+@media(max-height:720px){
+  .event-reveal-sheet.vertical-event-sheet{grid-template-rows:auto minmax(130px,27dvh) minmax(0,1fr) auto}
+  .event-reveal-reading{padding:10px 14px}.vertical-event-sheet .event-reveal-title{font-size:31px}.vertical-event-sheet .event-reveal-summary-copy{font-size:20px}
+  .event-decision-effect-large{font-size:17px;padding:9px 11px}.event-hand-status{padding:8px 10px}.event-hand-choice{flex-basis:min(58vw,235px);width:min(58vw,235px)}
+}
+
 </style>
 </head>
 <body>
@@ -5541,7 +5587,7 @@ const app = {
   state: null,
   messages: [],
   unread: 0,
-  ui: {selected:new Set(), selectedSpecific:null, focusCardUid:null, eventDecisionCardUid:null, eventDecisionScrollLeft:0, viewerZone:null, viewerParentZone:null, viewerIndex:0, lastPhaseKey:"", boardZoom:1, viewerZoom:1},
+  ui: {selected:new Set(), selectedSpecific:null, focusCardUid:null, eventDecisionCardUid:null, eventDecisionSelectedUids:new Set(), eventDecisionScrollLeft:0, viewerZone:null, viewerParentZone:null, viewerIndex:0, lastPhaseKey:"", boardZoom:1, viewerZoom:1},
   botTimer: null,
   eventRevealTimer: null,
   backGuardArmed: false
@@ -5945,9 +5991,10 @@ function eventChoiceOptions(state,p,choice){
   }
   return[];
 }
-function resolveEventChoice(state,p,choiceId){
+function resolveEventChoice(state,p,choiceId,cardUids=[]){
   const choice=currentEventChoice(state,p);if(!choice)return false;
-  const option=eventChoiceOptions(state,p,choice).find(x=>x.id===choiceId&&!x.disabled);if(!option)return false;
+  const exactHandChoice=(choice.kind==="savagery"||choice.kind==="desperation")&&choiceId==="confirm-selected";
+  const option=exactHandChoice?{id:choiceId,label:"Confirm selected cards"}:eventChoiceOptions(state,p,choice).find(x=>x.id===choiceId&&!x.disabled);if(!option)return false;
   const title=defOf(state.event)?.title||"Event";
   let complete=true;
   const useStep=()=>{choice.used.push(choiceId);choice.remaining=Math.max(0,Number(choice.remaining||1)-1);complete=choice.remaining<=0};
@@ -5955,8 +6002,22 @@ function resolveEventChoice(state,p,choiceId){
     case"thieves":if(choiceId==="discard-supply")discardLowest(state,p,1,c=>defOf(c)?.type==="supply");else if(choiceId==="discard-3")discardLowest(state,p,3);else damage(state,p,2,title);break;
     case"toughCall":if(choiceId==="lose-sp"){p.sp=Math.max(0,p.sp-1);logLine(state,`${p.name} lost 1 SP.`)}else if(choiceId==="discard-survivor")removeRandomColonyCard(state,p,"survivor");else damage(state,p,3,title);break;
     case"dangerousGamble":if(choiceId.startsWith("take:")){const id=choiceId.slice(5);if(!takeTradeCardByUid(state,p,id))return false;damage(state,p,2,title)}break;
-    case"savagery":{const n=Number(choiceId.split(":")[1]||0);discardLowest(state,p,n,c=>defOf(c)?.type==="supply");damage(state,p,Math.max(0,3-n),title);break}
-    case"desperation":{const n=Number(choiceId.split(":")[1]||0);discardLowest(state,p,n);damage(state,p,Math.max(0,5-n),title);break}
+    case"savagery":{
+      const selected=[...new Set(cardUids)].map(id=>p.hand.find(c=>c.uid===id)).filter(c=>c&&defOf(c)?.type==="supply").slice(0,3);
+      if(selected.length!==new Set(cardUids).size)return false;
+      selected.forEach(c=>p.discard.push(removeByUid(p.hand,c.uid)));
+      damage(state,p,Math.max(0,3-selected.length),title);
+      option.label=`Discarded ${selected.length} Suppl${selected.length===1?"y":"ies"} • Lost ${Math.max(0,3-selected.length)} Life`;
+      break
+    }
+    case"desperation":{
+      const selected=[...new Set(cardUids)].map(id=>p.hand.find(c=>c.uid===id)).filter(Boolean).slice(0,5);
+      if(selected.length!==new Set(cardUids).size)return false;
+      selected.forEach(c=>p.discard.push(removeByUid(p.hand,c.uid)));
+      damage(state,p,Math.max(0,5-selected.length),title);
+      option.label=`Discarded ${selected.length} Card${selected.length===1?"":"s"} • Lost ${Math.max(0,5-selected.length)} Life`;
+      break
+    }
     case"wrongTurn":if(choiceId==="discard-supply")discardLowest(state,p,1,c=>defOf(c)?.type==="supply");else if(choiceId==="trash-survivor")trashLowest(state,p,1,c=>defOf(c)?.type==="survivor");else damage(state,p,2,title);break;
     case"newWorldOrder":{const n=Number(choiceId.split(":")[1]||0);drawCards(state,p,n);damage(state,p,n,title);break}
     case"drought":{
@@ -6136,7 +6197,7 @@ function applyGameAction(playerId,action){
   }
   if(action.type==="start-round"){if(!isHost()||state.phase!=="round-ready")return false;return startRound(state)}
   if(action.type==="finish-event-reveal"){if(!isHost()||state.phase!=="event"||state.phaseStep!=="reveal")return false;return finishEventReveal(state)}
-  if(action.type==="event-choice"){if(state.phase!=="event"||state.phaseStep==="reveal"||activeEventDecisionPlayer(state)?.id!==playerId)return false;return resolveEventChoice(state,p,String(action.choiceId||""))}
+  if(action.type==="event-choice"){if(state.phase!=="event"||state.phaseStep==="reveal"||activeEventDecisionPlayer(state)?.id!==playerId)return false;return resolveEventChoice(state,p,String(action.choiceId||""),Array.isArray(action.cardUids)?action.cardUids:[])}
   if(action.type==="begin-action"){if(!isHost()||state.phase!=="event"||state.phaseStep==="reveal"||hasPendingEventChoices(state))return false;return beginActionPhase(state)}
   if(action.type==="restart"){if(!isHost())return false;app.state=createGame(state.players.map(x=>({id:x.id,name:x.name,isBot:x.isBot})),state.scenario);return true}
   if(action.type==="use-ammunition"){
@@ -6463,7 +6524,7 @@ async function disconnectRoom(showHome=true){
     try{await app.client.removeChannel(app.channel)}catch(_){}
   }
   app.channel=null;app.roomCode="";app.hostId=null;app.humans=[];app.started=false;app.localMode=false;app.state=null;app.messages=[];app.unread=0;app.backGuardArmed=false;
-  app.ui.selected.clear();app.ui.selectedSpecific=null;app.ui.focusCardUid=null;app.ui.eventDecisionCardUid=null;app.ui.eventDecisionScrollLeft=0;app.ui.viewerZone=null;app.ui.viewerParentZone=null;app.ui.viewerIndex=0;app.ui.viewerZoom=1;app.ui.lastPhaseKey="";
+  app.ui.selected.clear();app.ui.selectedSpecific=null;app.ui.focusCardUid=null;app.ui.eventDecisionCardUid=null;app.ui.eventDecisionSelectedUids.clear();app.ui.eventDecisionScrollLeft=0;app.ui.viewerZone=null;app.ui.viewerParentZone=null;app.ui.viewerIndex=0;app.ui.viewerZoom=1;app.ui.lastPhaseKey="";
   history.replaceState({screen:"home"},"",location.pathname+location.search);
   if(showHome)showScreen("homeScreen");
 }
@@ -6779,7 +6840,12 @@ function renderEventRevealOverlay(state){
   if(!state||state.phase!=="event"||state.phaseStep!=="reveal"||!state.event)return"";
   const ev=defOf(state.event),remaining=Math.max(0,Math.ceil((Number(state.eventRevealUntil||0)-Date.now())/1000));
   const message=remaining>0?`${remaining} second${remaining===1?"":"s"}`:"Preparing Player 1's decision…";
-  return `<div class="event-reveal-shade" role="dialog" aria-modal="true" aria-label="Event reveal"><section class="event-reveal-sheet"><div class="event-reveal-kicker">Round ${state.round} • Everyone Read</div><h2 class="event-reveal-title">${escapeHtml(ev?.title||"Current Event")}</h2><div class="event-reveal-card">${cardHTML(state.event,{context:"event-reveal",locked:true})}</div>${eventRevealSummaryHTML(ev)}<div class="event-reveal-countdown"><strong data-event-reveal-count>${escapeHtml(message)}</strong><span>Player 1's decision begins after the reveal.</span></div></section></div>`;
+  return `<div class="event-reveal-shade" role="dialog" aria-modal="true" aria-label="Event reveal"><section class="event-reveal-sheet vertical-event-sheet">
+    <div class="event-reveal-kicker">Round ${state.round} • Everyone Read</div>
+    <div class="event-reveal-hero" style="background-image:linear-gradient(180deg,transparent 35%,#080a08ee),url('${ART.event}')"><span>EVENT ${escapeHtml(ev?.code||"")}</span></div>
+    <div class="event-reveal-reading"><div class="event-reveal-tags">${escapeHtml(ev?.tags||"CURRENT EVENT")}</div><h2 class="event-reveal-title">${escapeHtml(ev?.title||"Current Event")}</h2>${eventRevealSummaryHTML(ev)}</div>
+    <div class="event-reveal-countdown"><strong data-event-reveal-count>${escapeHtml(message)}</strong><span>Player 1's decision begins after the reveal.</span></div>
+  </section></div>`;
 }
 function renderDecisionOverlay(state,p){
   if(!state||!p)return"";
@@ -6790,6 +6856,28 @@ function renderDecisionOverlay(state,p){
     if(!choice)return"";
     const remaining=Number(choice.remaining||1);
     const cards=eventChoicePreviewCards(state,p,choice);
+    if(choice.kind==="savagery"||choice.kind==="desperation"){
+      const eligible=choice.kind==="savagery"?p.hand.filter(c=>defOf(c)?.type==="supply"):p.hand;
+      const max=choice.kind==="savagery"?3:5;
+      const available=new Set(eligible.map(c=>c.uid));
+      [...app.ui.eventDecisionSelectedUids].forEach(id=>{if(!available.has(id))app.ui.eventDecisionSelectedUids.delete(id)});
+      while(app.ui.eventDecisionSelectedUids.size>max)app.ui.eventDecisionSelectedUids.delete([...app.ui.eventDecisionSelectedUids].pop());
+      const selected=[...app.ui.eventDecisionSelectedUids];
+      const lifeLoss=Math.max(0,max-selected.length);
+      const noun=choice.kind==="savagery"?`Suppl${selected.length===1?"y":"ies"}`:`Card${selected.length===1?"":"s"}`;
+      const instruction=choice.kind==="savagery"?"Select up to 3 Supply cards from your hand.":"Select up to 5 cards from your hand.";
+      const hand=eligible.length?`<div class="event-hand-strip selectable">${eligible.map(card=>`<div class="event-hand-choice${app.ui.eventDecisionSelectedUids.has(card.uid)?" selected":""}" data-event-hand-select="${card.uid}">${cardHTML(card,{small:true,selected:app.ui.eventDecisionSelectedUids.has(card.uid),context:"event-decision-select"})}</div>`).join("")}</div>`:`<div class="event-hand-empty">You do not have any eligible cards in your hand.</div>`;
+      return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Event hand decision"><section class="event-decision-sheet event-hand-decision-sheet">
+        <div class="event-decision-kicker">Your decision • ${escapeHtml(p.name)}</div>
+        <h2>${escapeHtml(ev?.title||"Current Event")}</h2>
+        <div class="event-decision-effect-large">${escapeHtml(ev?.effect||"")}</div>
+        <div class="event-hand-status"><b>${escapeHtml(instruction)}</b><span>${selected.length} selected • You will lose <strong>${lifeLoss} Life</strong></span></div>
+        <div class="event-hand-help">Tap a card to select it. Tap <b>i</b> to inspect it full-screen.</div>
+        ${hand}
+        <div class="event-decision-buttons compact-choice-actions"><button class="event-decision-button primary-decision" data-event-confirm-hand>${selected.length?`Discard ${selected.length} ${noun} • Lose ${lifeLoss} Life`:`Discard No Cards • Lose ${lifeLoss} Life`}</button></div>
+        <div class="event-decision-no-close">Your current Life: ${Number(p.health||0)}. Other players are waiting for your decision.</div>
+      </section></div>`;
+    }
     if(choice.kind==="dangerousGamble"){
       const available=new Set(cards.map(card=>card.uid));
       if(app.ui.eventDecisionCardUid&&!available.has(app.ui.eventDecisionCardUid))app.ui.eventDecisionCardUid=null;
@@ -6989,7 +7077,7 @@ function bindGameInteractions(){
   document.querySelectorAll("[data-open-card]").forEach(el=>el.onclick=()=>{if(el.dataset.openCard)openCard(el.dataset.openCard)});
   document.querySelectorAll("[data-pile-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("pick-trade",{pileIndex:Number(btn.dataset.pileChoice)})});
   document.querySelectorAll("[data-start-round]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("start-round")});
-  document.querySelectorAll("[data-event-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();app.ui.eventDecisionCardUid=null;requestAction("event-choice",{choiceId:btn.dataset.eventChoice})});
+  document.querySelectorAll("[data-event-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();app.ui.eventDecisionCardUid=null;app.ui.eventDecisionSelectedUids.clear();requestAction("event-choice",{choiceId:btn.dataset.eventChoice})});
   document.querySelectorAll("[data-event-card-select]").forEach(choice=>choice.onclick=e=>{
     if(e.target.closest(".card-info"))return;
     e.stopPropagation();
@@ -7006,6 +7094,23 @@ function bindGameInteractions(){
     if(!id)return toast("Select a card first.");
     app.ui.eventDecisionCardUid=null;
     requestAction("event-choice",{choiceId:`take:${id}`});
+  });
+  document.querySelectorAll("[data-event-hand-select]").forEach(choice=>choice.onclick=e=>{
+    if(e.target.closest(".card-info"))return;
+    e.stopPropagation();
+    const id=choice.dataset.eventHandSelect;
+    const currentChoice=currentEventChoice(app.state,myPlayer());
+    const max=currentChoice?.kind==="savagery"?3:5;
+    if(app.ui.eventDecisionSelectedUids.has(id))app.ui.eventDecisionSelectedUids.delete(id);
+    else if(app.ui.eventDecisionSelectedUids.size<max)app.ui.eventDecisionSelectedUids.add(id);
+    else return toast(`You may select up to ${max} cards.`);
+    renderGame();
+  });
+  document.querySelectorAll("[data-event-confirm-hand]").forEach(btn=>btn.onclick=e=>{
+    e.stopPropagation();
+    const cardUids=[...app.ui.eventDecisionSelectedUids];
+    app.ui.eventDecisionSelectedUids.clear();
+    requestAction("event-choice",{choiceId:"confirm-selected",cardUids});
   });
   document.querySelectorAll("[data-decision-act]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction(btn.dataset.decisionAct)});
   document.querySelectorAll(".card-info").forEach(btn=>btn.onclick=e=>{e.stopPropagation();openCard(btn.dataset.info)});
