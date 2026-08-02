@@ -232,6 +232,15 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 .trade-pick-button{display:block;width:calc(100% - 20px);margin:0 10px 10px;min-height:44px;border-radius:11px;border:1px solid #f0d080;background:linear-gradient(#d6b461,#a97e31);color:#21180b;font-weight:1000}
 .score-board{display:grid;gap:8px;padding:10px}.score-line{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;background:#ffffff08;border:1px solid #ffffff18;border-radius:12px;padding:9px}.score-line b{font-size:13px}.score-line strong{color:#edcc78}
 
+
+/* Trade Piles viewer: stacked piles with horizontal card rows, matching Trade selection */
+.trade-collection-slide{padding-left:0;padding-right:0;overscroll-behavior:contain}
+.trade-collection-slide .collection-menu-title{position:sticky;top:calc(var(--safe-top) + 45px);z-index:3;margin:0 10px 10px;padding:8px 12px;border:1px solid #556159;border-radius:12px;background:#111713ee;box-shadow:0 5px 16px #0009}
+.collection-trade-list{width:min(100%,680px);margin:0 auto;padding:0 10px 22px}
+.collection-trade-pile{scroll-margin-top:90px}
+.collection-market-row{padding-left:12px;padding-right:12vw;scroll-padding-inline:12px}
+.collection-market-row .game-card{cursor:pointer}
+
 /* Full-screen card browser: card, count, and a thin red close button only */
 .collection-viewer{position:fixed;z-index:170;inset:0;display:none;background:
  radial-gradient(circle at 20% 0%,rgba(61,101,81,.25),transparent 35%),linear-gradient(180deg,#171c18,#080a09);color:var(--text);overflow:hidden;touch-action:none}
@@ -1116,6 +1125,162 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
   .event-reveal-sheet.vertical-event-sheet{grid-template-rows:auto minmax(130px,27dvh) minmax(0,1fr) auto}
   .event-reveal-reading{padding:10px 14px}.vertical-event-sheet .event-reveal-title{font-size:31px}.vertical-event-sheet .event-reveal-summary-copy{font-size:20px}
   .event-decision-effect-large{font-size:17px;padding:9px 11px}.event-hand-status{padding:8px 10px}.event-hand-choice{flex-basis:min(78vw,340px);width:min(78vw,340px)}
+}
+
+
+/* Full-size vertical card carousel for Action-card choices */
+.action-card-decision-sheet{
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+  height:100dvh!important;
+  max-height:none!important;
+}
+.action-choice-header{flex:0 0 auto}
+.action-card-decision-sheet .event-decision-copy{padding-bottom:7px}
+.action-choice-swipe-note{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:2px 14px 8px;
+  color:#d8ccb5;
+  font:850 12px/1.25 system-ui;
+  text-align:center;
+}
+.action-choice-swipe-note b{color:#f3d574}
+.action-choice-viewport{
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  overflow:hidden;
+}
+.action-choice-track{
+  width:100%;
+  height:100%;
+  display:flex;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  touch-action:pan-x pan-y pinch-zoom;
+}
+.action-choice-track::-webkit-scrollbar{display:none}
+.action-choice-slide{
+  position:relative;
+  flex:0 0 100%;
+  width:100%;
+  height:100%;
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scroll-snap-align:center;
+  scroll-snap-stop:always;
+  padding:1px 12px 12px;
+  display:grid;
+  justify-items:center;
+  align-content:start;
+  gap:7px;
+}
+.action-choice-position{
+  min-height:30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 14px;
+  border:1px solid #62583e;
+  border-radius:999px;
+  background:#0c100edd;
+  color:#f0cf69;
+  font:950 12px/1 system-ui;
+  letter-spacing:.25px;
+  box-shadow:0 5px 16px #0008;
+}
+.action-choice-card{
+  position:relative;
+  width:min(88vw,430px)!important;
+  margin:0 auto;
+  padding:5px;
+  border:3px solid transparent;
+  border-radius:23px;
+  transition:border-color .14s,box-shadow .14s,transform .14s,background .14s;
+  cursor:pointer;
+}
+.action-choice-card .game-card{
+  width:100%!important;
+  max-width:none!important;
+  height:auto!important;
+  aspect-ratio:128/188!important;
+  display:grid!important;
+  grid-template-rows:12% 14% 38% 23% 13%!important;
+  pointer-events:auto!important;
+  border-radius:19px!important;
+}
+.action-choice-card .card-top,
+.action-choice-card .card-title,
+.action-choice-card .card-art,
+.action-choice-card .card-effect,
+.action-choice-card .card-statbar{height:auto!important;min-height:0!important}
+.action-choice-card .card-top{padding:0 12px!important}
+.action-choice-card .card-kind{font-size:14px!important}
+.action-choice-card .card-title{padding:0 12px!important;font-size:clamp(25px,8vw,34px)!important}
+.action-choice-card .card-effect{padding:11px 13px!important;font-size:clamp(18px,5.1vw,23px)!important;font-weight:720!important;line-height:1.22!important;overflow:auto!important}
+.action-choice-card .card-statbar.fixed-stat-grid{padding:9px 12px!important;gap:8px!important}
+.action-choice-card .card-statbar.fixed-stat-grid .card-stat{height:46px!important;min-height:46px!important;padding:0 14px!important;font-size:15px!important;border-radius:7px!important}
+.action-choice-card .card-statbar.fixed-stat-grid .card-stat b{font-size:20px!important}
+.action-choice-card .card-info{display:none!important}
+.action-choice-slide.selected .action-choice-card{
+  border-color:#f0c75d;
+  background:#e5bb4d15;
+  box-shadow:0 0 0 4px #eec34f42,0 0 34px #e0ab3599;
+  transform:translateY(-2px);
+}
+.action-choice-slide.selected .action-choice-card::before{
+  content:"SELECTED";
+  position:absolute;
+  z-index:6;
+  top:-9px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:6px 12px;
+  border:1px solid #fff0aa;
+  border-radius:999px;
+  background:#e5bb4d;
+  color:#241a08;
+  font:1000 10px/1 system-ui;
+  letter-spacing:.9px;
+  box-shadow:0 4px 12px #0009;
+}
+.action-choice-select-state{
+  color:#c7bdac;
+  font:850 12px/1.25 system-ui;
+  text-align:center;
+}
+.action-choice-slide.selected .action-choice-select-state{color:#f4d77a}
+.action-card-decision-sheet .compact-choice-actions{
+  flex:0 0 auto;
+  position:relative!important;
+  bottom:auto!important;
+  padding:10px 14px calc(env(safe-area-inset-bottom) + 10px)!important;
+  background:linear-gradient(180deg,#080a08e8,#050705 24%)!important;
+}
+.action-card-decision-sheet .event-decision-no-close{
+  flex:0 0 auto;
+  padding:2px 14px 7px;
+  background:#050705;
+}
+@media(max-height:760px){
+  .action-card-decision-sheet .event-decision-kicker{padding-top:8px;padding-bottom:4px}
+  .action-card-decision-sheet h2{font-size:clamp(25px,7vw,34px);padding-bottom:5px}
+  .action-card-decision-sheet .event-decision-event{margin-bottom:6px;padding:6px 10px}
+  .action-card-decision-sheet .event-decision-copy{font-size:12px;line-height:1.25;padding-bottom:4px}
+  .action-choice-swipe-note{font-size:11px;padding-bottom:4px}
+  .action-choice-position{min-height:26px;font-size:10px}
+  .action-choice-card{width:min(75vw,350px)!important}
+  .action-card-decision-sheet .event-decision-button{min-height:52px}
 }
 
 </style>
@@ -7095,10 +7260,22 @@ function renderDecisionOverlay(state,p){
     const selected=app.ui.actionDecisionCardUid,selectedCard=cards.find(card=>card.uid===selected)||null;
     const labels={"trade-card":"Choose a card from the Trade piles","survivor-row":"Choose a Survivor","scouting-pick":"Choose 1 of the 3 revealed cards","scouting-cost":"Discard a Supply or lose 1 Life","heroic-recruit":"Choose a Survivor to recruit","discard-one":"Choose a card to discard","building-plans":"Choose a Building to complete","trash-survivor":"Choose a Survivor card to trash"};
     const details={"trade-card":actionChoice.filter==="supply"?"Select the exact Supply card you want.":"Select the exact card you want.","survivor-row":"The chosen Survivor goes to your discard pile.","scouting-pick":"The chosen card goes into your hand. The other two are trashed.","scouting-cost":"Choose a Supply to discard, or lose 1 Life.","heroic-recruit":"Pay 3 Life to recruit the selected Survivor with no Supply payment.","discard-one":"The selected card goes to your discard pile.","building-plans":"The selected half-built Building is completed immediately.","trash-survivor":"The selected Survivor card is permanently trashed."};
-    const preview=cards.length?`<div class="event-decision-card-help"><b>Tap a card to select it.</b><span>Use its <strong>i</strong> button to inspect it full-screen.</span></div><div class="event-decision-card-strip selectable">${cards.map(card=>`<div class="event-decision-card-choice${card.uid===selected?" selected":""}" data-action-card-select="${card.uid}">${cardHTML(card,{small:true,selected:card.uid===selected,context:"event-decision-select"})}</div>`).join("")}</div>`:`<div class="event-hand-empty">There are no eligible cards available.</div>`;
+    const cardLocation=(card,index)=>{
+      if(actionChoice.kind==="trade-card"){
+        const pileIndex=state.market.findIndex(pile=>pile.some(item=>item.uid===card.uid));
+        const pile=state.market[pileIndex]||[];
+        const within=pile.findIndex(item=>item.uid===card.uid);
+        return `Trade Pile ${pileIndex+1} • Card ${within+1} of ${pile.length}`;
+      }
+      if(actionChoice.kind==="survivor-row")return `Survivor Row • ${index+1} of ${cards.length}`;
+      if(actionChoice.kind==="building-plans")return `Your Projects • ${index+1} of ${cards.length}`;
+      if(actionChoice.kind==="heroic-recruit"||actionChoice.kind==="discard-one"||actionChoice.kind==="trash-survivor"||actionChoice.kind==="scouting-cost")return `Your Hand • ${index+1} of ${cards.length}`;
+      return `${index+1} of ${cards.length}`;
+    };
+    const preview=cards.length?`<div class="action-choice-swipe-note"><b>Swipe</b> through the cards • Tap the large card to select it</div><div class="action-choice-viewport"><div class="action-choice-track">${cards.map((card,index)=>`<section class="action-choice-slide${card.uid===selected?" selected":""}" data-action-card-select="${card.uid}"><div class="action-choice-position">${escapeHtml(cardLocation(card,index))}</div><div class="collection-card action-choice-card">${cardHTML(card,{selected:card.uid===selected,context:"event-decision-select"})}</div><div class="action-choice-select-state" data-action-choice-card-state="${card.uid}">${card.uid===selected?"Selected — confirm below":"Tap this card to select it"}</div></section>`).join("")}</div></div>`:`<div class="event-hand-empty">There are no eligible cards available.</div>`;
     const confirmLabel=selectedCard?`Confirm • ${escapeHtml(defOf(selectedCard).title)}`:"Select a Card First";
     const loseButton=actionChoice.kind==="scouting-cost"?`<button class="event-decision-button" data-action-choice-option="lose-life">Lose 1 Life Instead</button>`:"";
-    return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Action card decision"><section class="event-decision-sheet"><div class="event-decision-kicker">Resolve Action • ${escapeHtml(p.name)}</div><h2>${escapeHtml(labels[actionChoice.kind]||"Choose a card")}</h2><div class="event-decision-event">${escapeHtml(actionChoice.title||"Action Card")}</div><p class="event-decision-copy">${escapeHtml(details[actionChoice.kind]||"")}</p>${preview}<div class="event-decision-buttons compact-choice-actions">${loseButton}<button class="event-decision-button primary-decision" data-action-choice-confirm${selectedCard?"":" disabled"}>${confirmLabel}</button></div><div class="event-decision-no-close">This Action card will not finish until you make this choice.</div></section></div>`;
+    return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Action card decision"><section class="event-decision-sheet action-card-decision-sheet"><div class="action-choice-header"><div class="event-decision-kicker">Resolve Action • ${escapeHtml(p.name)}</div><h2>${escapeHtml(labels[actionChoice.kind]||"Choose a card")}</h2><div class="event-decision-event">${escapeHtml(actionChoice.title||"Action Card")}</div><p class="event-decision-copy">${escapeHtml(details[actionChoice.kind]||"")}</p></div>${preview}<div class="event-decision-buttons compact-choice-actions">${loseButton}<button class="event-decision-button primary-decision" data-action-choice-confirm${selectedCard?"":" disabled"}>${confirmLabel}</button></div><div class="event-decision-no-close">This Action card will not finish until you make this choice.</div></section></div>`;
   }
   const current=activePlayer(state);
   if(state.phase==="action"&&current?.id===p.id&&state.eventActionStartZero&&Number(p.actionsLeft||0)<=0){
@@ -7305,7 +7482,12 @@ function bindGameInteractions(){
   document.querySelectorAll("[data-action-card-select]").forEach(choice=>choice.onclick=e=>{
     if(e.target.closest(".card-info"))return;e.stopPropagation();
     const id=choice.dataset.actionCardSelect;app.ui.actionDecisionCardUid=app.ui.actionDecisionCardUid===id?null:id;
-    document.querySelectorAll("[data-action-card-select]").forEach(el=>el.classList.toggle("selected",el.dataset.actionCardSelect===app.ui.actionDecisionCardUid));
+    document.querySelectorAll("[data-action-card-select]").forEach(el=>{
+      const isSelected=el.dataset.actionCardSelect===app.ui.actionDecisionCardUid;
+      el.classList.toggle("selected",isSelected);
+      const status=el.querySelector("[data-action-choice-card-state]");
+      if(status)status.textContent=isSelected?"Selected — confirm below":"Tap this card to select it";
+    });
     const confirm=document.querySelector("[data-action-choice-confirm]");
     const card=actionChoiceCards(app.state,myPlayer(),app.state.actionChoice).find(item=>item.uid===app.ui.actionDecisionCardUid);
     if(confirm){confirm.toggleAttribute("disabled",!card);confirm.textContent=card?`Confirm • ${defOf(card).title}`:"Select a Card First"}
@@ -7508,9 +7690,26 @@ function renderCollection(zone,preservePosition=false){
     return;
   }
   if(data.menu){
-    track.innerHTML=`<section class="collection-menu-slide"><h2 class="collection-menu-title">Trade Piles</h2><div class="pile-menu">${data.menu.map(x=>`<button class="pile-menu-button" data-open-pile="${x.index}"><span>${escapeHtml(x.label)}</span><small>${x.count} card${x.count===1?"":"s"} ›</small></button>`).join("")||'<div class="viewer-empty">No trade piles are available.</div>'}</div></section>`;
+    track.innerHTML=`<section class="collection-menu-slide trade-collection-slide"><h2 class="collection-menu-title">Trade Piles</h2><div class="trade-phase-list collection-trade-list">${data.menu.map(x=>{
+      const pile=app.state?.market?.[x.index]||[];
+      return `<section class="trade-phone-pile collection-trade-pile"><div class="trade-phone-head"><b>${escapeHtml(x.label)}</b><span>${x.count} card${x.count===1?"":"s"}</span></div><div class="phone-card-row collection-market-row">${pile.map(c=>cardHTML(c,{context:"market-overview"})).join("")||'<div class="phone-empty">This pile is empty.</div>'}</div></section>`;
+    }).join("")||'<div class="viewer-empty">No trade piles are available.</div>'}</div></section>`;
     app.ui.viewerIndex=0;app.ui.viewerZoom=1;
-    track.querySelectorAll("[data-open-pile]").forEach(btn=>btn.onclick=()=>{app.ui.viewerParentZone="market";openCollection(`market-pile:${btn.dataset.openPile}`,0,true)});
+    track.querySelectorAll('.game-card[data-context="market-overview"]').forEach(card=>card.onclick=e=>{
+      if(e.target.closest(".card-info"))return;
+      e.stopPropagation();
+      const where=zoneAndIndexForCard(card.dataset.card);
+      if(!where)return;
+      app.ui.viewerParentZone="market";
+      openCollection(where.zone,where.index,true);
+    });
+    track.querySelectorAll('.game-card[data-context="market-overview"] .card-info').forEach(btn=>btn.onclick=e=>{
+      e.stopPropagation();
+      const where=zoneAndIndexForCard(btn.dataset.info);
+      if(!where)return;
+      app.ui.viewerParentZone="market";
+      openCollection(where.zone,where.index,true);
+    });
     return;
   }
   if(data.log){
