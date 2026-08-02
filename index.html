@@ -1055,8 +1055,17 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 .event-hand-help{padding:0 16px 8px;color:#bdb5a5;font:750 12px/1.3 system-ui;text-align:center}
 .event-hand-strip{flex:1;min-height:0;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:4px 16vw 12px 7vw;scroll-padding-inline:7vw;scroll-snap-type:x mandatory;align-items:center;scrollbar-width:none}
 .event-hand-strip::-webkit-scrollbar{display:none}
-.event-hand-choice{position:relative;flex:0 0 min(72vw,300px);width:min(72vw,300px);padding:4px;border:3px solid transparent;border-radius:18px;scroll-snap-align:start;transition:.14s transform,.14s border-color,.14s box-shadow}
-.event-hand-choice .game-card{width:100%!important;max-width:none!important;pointer-events:auto!important}
+.event-hand-choice{position:relative;flex:0 0 min(68vw,286px);width:min(68vw,286px);padding:4px;border:3px solid transparent;border-radius:18px;scroll-snap-align:start;transition:.14s transform,.14s border-color,.14s box-shadow}
+.event-hand-choice .game-card{width:100%!important;max-width:none!important;height:auto!important;aspect-ratio:128/188;display:grid!important;grid-template-rows:8% 11% 32% 29% 20%;pointer-events:auto!important;border-radius:16px}
+.event-hand-choice .game-card .card-top,.event-hand-choice .game-card .card-title,.event-hand-choice .game-card .card-art,.event-hand-choice .game-card .card-effect,.event-hand-choice .game-card .card-statbar{height:auto!important;min-height:0}
+.event-hand-choice .game-card .card-top{padding:0 7px}
+.event-hand-choice .game-card .card-title{padding:0 7px;font-size:clamp(20px,5.2vw,27px)}
+.event-hand-choice .game-card .card-kind{font-size:11px}
+.event-hand-choice .game-card .card-effect{padding:8px 9px;font-size:clamp(13px,3.5vw,17px);line-height:1.18}
+.event-hand-choice .game-card .card-statbar.fixed-stat-grid{height:auto!important;padding:6px 8px 8px;gap:6px}
+.event-hand-choice .game-card .card-statbar.fixed-stat-grid .card-stat{height:auto;min-height:30px;padding:0 5px;font-size:10px}
+.event-hand-choice .game-card .card-statbar.fixed-stat-grid .card-stat b{font-size:15px}
+.event-hand-choice .game-card .card-info{display:grid!important;width:30px;height:30px;font-size:15px}
 .event-hand-choice.selected{border-color:#f0c75d;background:#e6b94018;box-shadow:0 0 0 4px #eec34f44,0 0 30px #e0ab35aa;transform:translateY(-3px)}
 .event-hand-choice.selected::after{content:"SELECTED";position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:5;padding:5px 10px;border-radius:999px;background:#e5bb4d;color:#241a08;border:1px solid #fff0aa;font:1000 10px/1 system-ui;letter-spacing:.8px;box-shadow:0 3px 10px #0009}
 .event-hand-empty{flex:1;display:grid;place-items:center;margin:12px 18px;padding:20px;border:1px dashed #73694f;border-radius:15px;color:#cfc5b1;text-align:center}
@@ -1065,7 +1074,7 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 @media(max-height:720px){
   .event-reveal-sheet.vertical-event-sheet{grid-template-rows:auto minmax(130px,27dvh) minmax(0,1fr) auto}
   .event-reveal-reading{padding:10px 14px}.vertical-event-sheet .event-reveal-title{font-size:31px}.vertical-event-sheet .event-reveal-summary-copy{font-size:20px}
-  .event-decision-effect-large{font-size:17px;padding:9px 11px}.event-hand-status{padding:8px 10px}.event-hand-choice{flex-basis:min(58vw,235px);width:min(58vw,235px)}
+  .event-decision-effect-large{font-size:17px;padding:9px 11px}.event-hand-status{padding:8px 10px}.event-hand-choice{flex-basis:min(62vw,248px);width:min(62vw,248px)}
 }
 
 </style>
@@ -6904,15 +6913,15 @@ function renderDecisionOverlay(state,p){
       const lifeLoss=Math.max(0,max-selected.length);
       const noun=choice.kind==="savagery"?`Suppl${selected.length===1?"y":"ies"}`:`Card${selected.length===1?"":"s"}`;
       const instruction=choice.kind==="savagery"?"Select up to 3 Supply cards from your hand.":"Select up to 5 cards from your hand.";
-      const hand=eligible.length?`<div class="event-hand-strip selectable">${eligible.map(card=>`<div class="event-hand-choice${app.ui.eventDecisionSelectedUids.has(card.uid)?" selected":""}" data-event-hand-select="${card.uid}">${cardHTML(card,{small:true,selected:app.ui.eventDecisionSelectedUids.has(card.uid),context:"event-decision-select"})}</div>`).join("")}</div>`:`<div class="event-hand-empty">You do not have any eligible cards in your hand.</div>`;
+      const hand=eligible.length?`<div class="event-hand-strip selectable">${eligible.map(card=>`<div class="event-hand-choice${app.ui.eventDecisionSelectedUids.has(card.uid)?" selected":""}" data-event-hand-select="${card.uid}">${cardHTML(card,{context:"event-decision-select"})}</div>`).join("")}</div>`:`<div class="event-hand-empty">You do not have any eligible cards in your hand.</div>`;
       return `<div class="event-decision-shade" role="dialog" aria-modal="true" aria-label="Event hand decision"><section class="event-decision-sheet event-hand-decision-sheet">
         <div class="event-decision-kicker">Your decision • ${escapeHtml(p.name)}</div>
         <h2>${escapeHtml(ev?.title||"Current Event")}</h2>
         <div class="event-decision-effect-large">${escapeHtml(ev?.effect||"")}</div>
-        <div class="event-hand-status"><b>${escapeHtml(instruction)}</b><span>${selected.length} selected • You will lose <strong>${lifeLoss} Life</strong></span></div>
+        <div class="event-hand-status"><b>${escapeHtml(instruction)}</b><span data-event-hand-summary>${selected.length} selected • You will lose <strong>${lifeLoss} Life</strong></span></div>
         <div class="event-hand-help">Tap a card to select it. Tap <b>i</b> to inspect it full-screen.</div>
         ${hand}
-        <div class="event-decision-buttons compact-choice-actions"><button class="event-decision-button primary-decision" data-event-confirm-hand>${selected.length?`Discard ${selected.length} ${noun} • Lose ${lifeLoss} Life`:`Discard No Cards • Lose ${lifeLoss} Life`}</button></div>
+        <div class="event-decision-buttons compact-choice-actions"><button class="event-decision-button primary-decision" data-event-confirm-hand data-event-kind="${choice.kind}" data-event-max="${max}">${selected.length?`Discard ${selected.length} ${noun} • Lose ${lifeLoss} Life`:`Discard No Cards • Lose ${lifeLoss} Life`}</button></div>
         <div class="event-decision-no-close">Your current Life: ${Number(p.health||0)}. Other players are waiting for your decision.</div>
       </section></div>`;
     }
@@ -7143,7 +7152,17 @@ function bindGameInteractions(){
     if(app.ui.eventDecisionSelectedUids.has(id))app.ui.eventDecisionSelectedUids.delete(id);
     else if(app.ui.eventDecisionSelectedUids.size<max)app.ui.eventDecisionSelectedUids.add(id);
     else return toast(`You may select up to ${max} cards.`);
-    renderGame();
+    const selectedCount=app.ui.eventDecisionSelectedUids.size;
+    const lifeLoss=Math.max(0,max-selectedCount);
+    document.querySelectorAll("[data-event-hand-select]").forEach(el=>el.classList.toggle("selected",app.ui.eventDecisionSelectedUids.has(el.dataset.eventHandSelect)));
+    const summary=document.querySelector("[data-event-hand-summary]");
+    if(summary)summary.innerHTML=`${selectedCount} selected • You will lose <strong>${lifeLoss} Life</strong>`;
+    const confirm=document.querySelector("[data-event-confirm-hand]");
+    if(confirm){
+      const kind=confirm.dataset.eventKind||currentChoice?.kind;
+      const noun=kind==="savagery"?(selectedCount===1?"Supply":"Supplies"):(selectedCount===1?"Card":"Cards");
+      confirm.textContent=selectedCount?`Discard ${selectedCount} ${noun} • Lose ${lifeLoss} Life`:`Discard No Cards • Lose ${lifeLoss} Life`;
+    }
   });
   document.querySelectorAll("[data-event-confirm-hand]").forEach(btn=>btn.onclick=e=>{
     e.stopPropagation();
