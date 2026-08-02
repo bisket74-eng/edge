@@ -834,6 +834,16 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
   #phaseControls .controls-right button{max-width:122px}
 }
 
+/* Clear selected-card action above the hand instead of squeezing it into the bottom bar */
+.workspace-action-bar{padding:10px 12px 2px}
+.workspace-action-button{width:100%;min-height:54px;border-radius:12px;border:1px solid #6e9ebe;color:#f5fbff;font:950 16px/1.15 system-ui;letter-spacing:.25px;padding:9px 14px;box-shadow:inset 0 1px #ffffff2b,0 4px 13px #0008;text-align:center}
+.workspace-action-button.action-play{background:linear-gradient(#1689c2,#075879);border-color:#65c9f3}
+.workspace-action-button.action-build{background:linear-gradient(#b58a35,#6f4f18);border-color:#e4c473;color:#fff3cf}
+.workspace-action-button.action-reload{background:linear-gradient(#497057,#253c2d);border-color:#84ad8d}
+.workspace-action-button.action-discard{background:linear-gradient(#59605b,#303531);border-color:#858e87}
+.workspace-action-button:disabled{opacity:.42;filter:grayscale(.65)}
+.workspace-action-note{display:block;margin-top:5px;color:#afbab2;font-size:10px;font-weight:700}
+
 /* Human Event choices */
 .event-choice-panel{margin:10px 12px 18px;padding:13px;border:1px solid #947b47;border-radius:14px;background:linear-gradient(180deg,#30291d,#171713);box-shadow:0 8px 22px #0009}
 .event-choice-panel h3{margin:0 0 5px;color:#f0d584;font-size:17px;letter-spacing:.3px}
@@ -6748,10 +6758,38 @@ function renderQuickZones(state,p){
     ${quickZoneButton(state,p,"event","Event","⚠")}
   </div>`;
 }
+function renderActionSelectionControl(state,p){
+  const current=activePlayer(state);
+  if(!p||state.phase!=="action"||current?.id!==app.id)return "";
+  const selected=[...app.ui.selected].map(id=>p.hand.find(c=>c.uid===id)).filter(Boolean);
+  const actionCard=selected.find(c=>defOf(c).type==="action");
+  const buildingCard=selected.find(c=>defOf(c).type==="building");
+  const ammoCard=selected.find(c=>c.defId==="ammunition");
+  const supplies=selected.filter(c=>defOf(c).type==="supply");
+  const supplyValue=supplies.reduce((n,c)=>n+Number(defOf(c).value||0),0);
+  const hasUnloaded=weaponCards(p).some(w=>Number(w.bullets||0)<Number(defOf(w).maxBullets||1));
+  let button="",note="";
+  if(ammoCard&&hasUnloaded){
+    button=`<button class="workspace-action-button action-reload" data-work-act="use-ammunition" data-card="${ammoCard.uid}">DISCARD AMMUNITION • RELOAD WEAPONS</button>`;
+  }else if(p.actionsLeft>0&&actionCard){
+    button=`<button class="workspace-action-button action-play" data-work-act="play-action" data-card="${actionCard.uid}">PLAY ${escapeHtml(defOf(actionCard).title).toUpperCase()}</button>`;
+    note="This plays the selected Action card and uses 1 Action.";
+  }else if(p.actionsLeft>0&&(buildingCard||app.ui.selectedSpecific)){
+    const project=app.ui.selectedSpecific?p.projects.find(x=>x.id===app.ui.selectedSpecific):null;
+    const needed=project?Math.max(0,Number(project.cost||0)-Number(project.progress||0)):buildingCard?effectiveBuildingCost(p,defOf(buildingCard)):0;
+    const label=supplyValue>0?(project?`ADD ${supplyValue} SUPPLY • ${Math.max(0,needed-supplyValue)} STILL NEEDED`:`START BUILDING • ADD ${supplyValue} SUPPLY`):"SELECT AT LEAST 1 SUPPLY";
+    button=`<button class="workspace-action-button action-build" data-work-act="build" data-building="${buildingCard?.uid||""}" data-project="${app.ui.selectedSpecific||""}"${supplyValue<=0?" disabled":""}>${label}</button>`;
+  }else if(p.actionsLeft>0&&selected.length&&!actionCard&&!buildingCard&&!app.ui.selectedSpecific&&!(ammoCard&&hasUnloaded)){
+    button=`<button class="workspace-action-button action-discard" data-work-act="discard">DISCARD SELECTED CARDS (${selected.length})</button>`;
+  }
+  return button?`<div class="workspace-action-bar">${button}${note?`<span class="workspace-action-note">${escapeHtml(note)}</span>`:""}</div>`:"";
+}
+
 function renderPhoneHand(state,p,title,subtitle){
   if(!p)return `<div class="phone-empty">You are watching this game as a spectator.</div>`;
   return `<div class="phase-workspace-head"><b>${escapeHtml(title)}</b><span>${escapeHtml(subtitle)}</span></div>
     <div class="phase-hint">${escapeHtml(currentMessage(state,p))}</div>
+    ${renderActionSelectionControl(state,p)}
     <div class="phone-card-row">${p.hand.map(c=>cardHTML(c,{selected:app.ui.selected.has(c.uid),context:"hand"})).join("")||'<div class="phone-empty">Your hand is empty.</div>'}</div>`;
 }
 function renderTradeWorkspace(state){
@@ -6996,17 +7034,7 @@ function renderControls(state,p){
   const current=activePlayer(state),mine=current&&current.id===app.id;let buttons="";
   if(state.phase==="event"&&state.phaseStep!=="reveal"&&isHost()&&!hasPendingEventChoices(state))buttons=`<button class="primary" data-act="begin-action">Begin Action</button>`;
   else if(state.phase==="action"&&mine){
-    const selected=[...app.ui.selected].map(id=>p.hand.find(c=>c.uid===id)).filter(Boolean),actionCard=selected.find(c=>defOf(c).type==="action"),buildingCard=selected.find(c=>defOf(c).type==="building"),ammoCard=selected.find(c=>c.defId==="ammunition"),supplies=selected.filter(c=>defOf(c).type==="supply"),supplyValue=supplies.reduce((n,c)=>n+Number(defOf(c).value||0),0),hasUnloaded=weaponCards(p).some(w=>Number(w.bullets||0)<Number(defOf(w).maxBullets||1));
-    if(ammoCard&&hasUnloaded)buttons+=`<button class="primary" data-act="use-ammunition" data-card="${ammoCard.uid}">Discard Ammunition • Reload</button>`;
-    if(p.actionsLeft>0&&actionCard)buttons+=`<button class="primary" data-act="play-action" data-card="${actionCard.uid}">Play ${escapeHtml(defOf(actionCard).title)}</button>`;
-    if(p.actionsLeft>0&&(buildingCard||app.ui.selectedSpecific)){
-      const project=app.ui.selectedSpecific?p.projects.find(x=>x.id===app.ui.selectedSpecific):null;
-      const needed=project?Math.max(0,Number(project.cost||0)-Number(project.progress||0)):buildingCard?effectiveBuildingCost(p,defOf(buildingCard)):0;
-      const label=supplyValue>0?(project?`Add ${supplyValue} Supply • ${Math.max(0,needed-supplyValue)} Still Needed`:`Start Building • Add ${supplyValue} Supply`):"Select at Least 1 Supply";
-      buttons+=`<button class="primary" data-act="build" data-building="${buildingCard?.uid||""}" data-project="${app.ui.selectedSpecific||""}"${supplyValue<=0?" disabled":""}>${label}</button>`;
-    }
-    if(p.actionsLeft>0&&selected.length&&!actionCard&&!buildingCard&&!app.ui.selectedSpecific&&!(ammoCard&&hasUnloaded))buttons+=`<button class="secondary" data-act="discard">Discard (${selected.length})</button>`;
-    buttons+=`<button class="ghost turn-end-button" data-act="rest">End Action Turn</button>`;
+    buttons=`<button class="ghost turn-end-button" data-act="rest">End Action Turn</button>`;
   }else if(state.phase==="trade"&&state.phaseStep==="bid"&&p&&!p.bidSubmitted){
     const ids=[...app.ui.selected].filter(id=>p.hand.some(c=>c.uid===id&&Number(defOf(c).trade||0)>0)),value=calculateBid(state,p,ids);buttons=`<button class="primary" data-act="submit-bid">Submit Bid ${value}</button>`;
   }else if(state.phase==="recruit"&&mine){
@@ -7039,7 +7067,7 @@ function cardSelectionMode(state,p,inst){
   return null;
 }
 function setCardSelection(inst){
-  const p=myPlayer(),state=app.state,mode=cardSelectionMode(state,p,inst);if(!mode)return {allowed:false,selected:false};
+  const p=myPlayer(),state=app.state,mode=cardSelectionMode(state,p,inst),d=defOf(inst);if(!mode)return {allowed:false,selected:false};
   const uidValue=inst.uid,was=app.ui.selected.has(uidValue);
   if(was){
     if(mode==="single-main"&&d.type==="building")app.ui.selected.clear();
@@ -7077,6 +7105,17 @@ function bindGameInteractions(){
   document.querySelectorAll("[data-open-card]").forEach(el=>el.onclick=()=>{if(el.dataset.openCard)openCard(el.dataset.openCard)});
   document.querySelectorAll("[data-pile-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("pick-trade",{pileIndex:Number(btn.dataset.pileChoice)})});
   document.querySelectorAll("[data-start-round]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("start-round")});
+  document.querySelectorAll("[data-work-act]").forEach(btn=>btn.onclick=e=>{
+    e.stopPropagation();
+    const p=myPlayer();if(!p)return;
+    const type=btn.dataset.workAct;
+    if(type==="play-action")requestAction(type,{cardUid:btn.dataset.card});
+    else if(type==="use-ammunition")requestAction(type,{cardUid:btn.dataset.card});
+    else if(type==="build"){
+      const supplies=[...app.ui.selected].filter(id=>p.hand.some(c=>c.uid===id&&defOf(c).type==="supply"));
+      requestAction(type,{buildingUid:btn.dataset.building||null,projectId:btn.dataset.project||null,supplyUids:supplies});
+    }else if(type==="discard")requestAction(type,{cardUids:[...app.ui.selected]});
+  });
   document.querySelectorAll("[data-event-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();app.ui.eventDecisionCardUid=null;app.ui.eventDecisionSelectedUids.clear();requestAction("event-choice",{choiceId:btn.dataset.eventChoice})});
   document.querySelectorAll("[data-event-card-select]").forEach(choice=>choice.onclick=e=>{
     if(e.target.closest(".card-info"))return;
