@@ -55,7 +55,7 @@ button:disabled{opacity:.38;cursor:default}
 .chat-badge.show{display:grid}
 .content-scroll{flex:1;overflow:auto;overscroll-behavior:contain;padding:12px 12px calc(var(--safe-bottom) + 12px)}
 .lobby-wrap{width:min(100%,680px);margin:0 auto;display:grid;gap:12px}
-.room-card{padding:16px;text-align:center}
+.room-card{padding:13px 10px;text-align:center}
 .room-code-label{font-size:11px;letter-spacing:1.5px;color:#b9c2b8;text-transform:uppercase}
 .room-code{font:900 clamp(40px,14vw,72px)/1 system-ui;letter-spacing:7px;color:#f0d179;margin:4px 0 2px}
 .copy-note{font-size:11px;color:#9ca79d}
@@ -65,13 +65,14 @@ button:disabled{opacity:.38;cursor:default}
 .player-chip .name{min-width:0;flex:1;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .player-chip small{font-size:9px;color:#aeb5ad}
 .host-settings{padding:13px;display:grid;gap:10px}
-.setting-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.setting-grid{display:grid;grid-template-columns:1fr;gap:9px}
 .setting-box{background:#0b0e0c7d;border:1px solid #ffffff18;border-radius:12px;padding:10px;display:grid;gap:6px}
 .setting-box b{font-size:11px;color:#d9c99f}
+.full-width-setting{width:100%}.auto-bot-note{display:block;text-align:center;color:#9da59f;font-size:10px;line-height:1.3}
 .stepper{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:6px}
 .stepper button{height:38px;border-radius:10px;border:1px solid #ffffff24;background:#ffffff0d;color:white;font-size:22px}
 .stepper span{text-align:center;font-size:22px;font-weight:950}
-.lobby-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.lobby-actions{display:grid;grid-template-columns:1fr;gap:9px}
 .waiting{padding:14px;text-align:center;color:#c4c8c2}
 .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#6bb678;box-shadow:0 0 0 0 #6bb67899;animation:pulse 1.6s infinite;margin-right:5px}
 @keyframes pulse{70%{box-shadow:0 0 0 9px #6bb67800}100%{box-shadow:0 0 0 0 #6bb67800}}
@@ -209,8 +210,8 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 .zone-button{flex:0 0 auto;min-height:40px;padding:0 11px;border-radius:12px;border:1px solid #566158;background:linear-gradient(#252d27,#151a17);color:#eee5d4;font-size:11px;font-weight:900;white-space:nowrap;box-shadow:inset 0 1px #ffffff0b}
 .zone-button strong{display:inline-grid;place-items:center;min-width:19px;height:19px;margin-left:5px;padding:0 5px;border-radius:20px;background:#d1aa54;color:#23190b;font-size:9px}
 .zone-button.phase-zone{border-color:#d1aa54;background:linear-gradient(#5d4826,#302513)}
-.phone-card-row{display:flex;gap:16px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:9vw;padding:12px 9vw 7px;align-items:flex-start}
-.phone-card-row .game-card{flex:0 0 min(82vw,340px);width:min(82vw,340px);height:auto;aspect-ratio:128/188;display:grid;grid-template-rows:12% 14% 38% 23% 13%;scroll-snap-align:center;border-radius:15px}
+.phone-card-row{display:flex;gap:16px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:5vw;padding:12px 5vw 7px;align-items:flex-start}
+.phone-card-row .game-card{flex:0 0 min(80vw,332px);width:min(80vw,332px);height:auto;aspect-ratio:128/188;display:grid;grid-template-rows:12% 14% 38% 23% 13%;scroll-snap-align:start;border-radius:15px}
 .phone-card-row .card-top,.phone-card-row .card-title,.phone-card-row .card-art,.phone-card-row .card-effect,.phone-card-row .card-statbar{height:auto;min-height:0}
 .phone-card-row .card-top{padding:0 10px}.phone-card-row .card-kind{font-size:12px}.phone-card-row .card-cost{display:none}.phone-card-row .card-statbar{padding:7px 10px;gap:7px}.phone-card-row .card-stat{height:38px;padding:0 12px;font-size:13px;border-radius:6px}.phone-card-row .card-stat b{font-size:18px}
 .phone-card-row .card-title{padding:0 10px;font-size:clamp(20px,6vw,28px)}
@@ -802,8 +803,8 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 .voice-talk-button{
   position:relative;width:64px;height:64px;min-height:64px!important;padding:0!important;border-radius:50%!important;
   display:grid;place-items:center;font-size:25px;line-height:1;touch-action:none;user-select:none;-webkit-user-select:none;
-  color:#fff;background:radial-gradient(circle at 38% 30%,#7d2424,#3b0c0c 68%,#180606);
-  border:2px solid #b95a55;box-shadow:inset 0 1px #ffffff24,0 4px 14px #000b;
+  color:#f6e5bd;background:radial-gradient(circle at 38% 30%,#756749,#3b372d 62%,#1a1915);
+  border:2px solid #a99059;box-shadow:inset 0 1px #ffffff24,0 4px 14px #000b,0 0 0 1px #d7bd7a22;
   transition:transform .1s,background .1s,border-color .1s,box-shadow .1s;
   overflow:visible;
 }
@@ -813,8 +814,8 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
 .voice-talk-button::before{inset:-12px;border:5px solid rgba(255,49,45,.9);box-shadow:0 0 18px rgba(255,40,35,.95)}
 .voice-talk-button::after{inset:-22px;border:7px solid rgba(255,38,32,.38);box-shadow:0 0 34px rgba(255,32,28,.9)}
 .voice-talk-button.talking{
-  transform:scale(1.08);background:radial-gradient(circle at 38% 30%,#ff5a50,#d41414 58%,#710707);
-  border-color:#fff0e8;box-shadow:inset 0 1px #fff8,0 0 0 5px rgba(255,54,47,.6),0 0 32px 12px rgba(255,31,27,.78);
+  transform:scale(1.08);background:radial-gradient(circle at 38% 30%,#8b7a54,#454034 62%,#1d1b17);
+  border-color:#f5dfaa;box-shadow:inset 0 1px #fff6,0 0 0 5px rgba(255,54,47,.6),0 0 32px 12px rgba(255,31,27,.78);
 }
 .voice-talk-button.talking::before{opacity:1;animation:voiceRingPulse .8s ease-in-out infinite alternate}
 .voice-talk-button.talking::after{opacity:1;animation:voiceOuterPulse .8s ease-in-out infinite alternate}
@@ -832,6 +833,17 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
   .voice-talk-button{width:62px;height:62px;min-height:62px!important;font-size:25px}
   #phaseControls .controls-right button{max-width:122px}
 }
+
+/* Human Event choices */
+.event-choice-panel{margin:10px 12px 18px;padding:13px;border:1px solid #947b47;border-radius:14px;background:linear-gradient(180deg,#30291d,#171713);box-shadow:0 8px 22px #0009}
+.event-choice-panel h3{margin:0 0 5px;color:#f0d584;font-size:17px;letter-spacing:.3px}
+.event-choice-panel p{margin:0 0 10px;color:#d4c9b2;font-size:12px;line-height:1.35}
+.event-choice-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.event-choice-button{min-height:48px;padding:9px 8px;border:1px solid #8f7b52;border-radius:10px;background:linear-gradient(#4a4437,#292720);color:#f4e7c8;font:900 12px/1.18 system-ui;box-shadow:inset 0 1px #fff1,0 3px 9px #0007}
+.event-choice-button:active{transform:translateY(1px);background:linear-gradient(#66583d,#332e24)}
+.event-choice-button:disabled{opacity:.34;filter:grayscale(.7)}
+.event-choice-wait{margin:10px 12px 18px;padding:11px 12px;border:1px solid #5f5a49;border-radius:11px;background:#191a17;color:#bcb39e;text-align:center;font-size:12px}
+@media(max-width:420px){.event-choice-buttons{grid-template-columns:1fr}.event-choice-button{min-height:44px}}
 </style>
 </head>
 <body>
@@ -875,7 +887,6 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
         <div class="section-head"><b>Players</b><span id="playerCountText">0 connected</span></div>
         <div id="lobbyPlayers" class="player-list"></div>
       </div>
-      <div class="panel scenario-summary"><div class="section-head"><b>Scenario</b><span id="scenarioNameDisplay">Epidemic — New York</span></div></div>
       <div id="hostSettings" class="panel host-settings hidden">
         <label class="field-label" for="scenarioSelect">Choose Scenario</label>
         <select id="scenarioSelect" class="text-input scenario-select">
@@ -884,18 +895,14 @@ html,body,#gameScreen,.game-scroll,.collection-viewer{touch-action:pan-x pan-y p
           <option value="3">3 — Alien Invasion / Nebraska</option>
         </select>
         <div class="setting-grid">
-          <div class="setting-box">
-            <b>Total Seats</b>
+          <div class="setting-box full-width-setting">
+            <b>Total Players</b>
             <div class="stepper"><button id="seatMinus">−</button><span id="seatCount">3</span><button id="seatPlus">+</button></div>
-          </div>
-          <div class="setting-box">
-            <b>Computer Players</b>
-            <div class="stepper"><button id="botMinus">−</button><span id="botCount">0</span><button id="botPlus">+</button></div>
+            <small class="auto-bot-note">Empty seats fill with bots when the game starts.</small>
           </div>
         </div>
         <div class="lobby-actions">
           <button id="startGameButton" class="primary">Start Game</button>
-          <button id="copyInviteButton" class="secondary">Copy Invite</button>
         </div>
       </div>
       <div id="guestWaiting" class="panel waiting"><span class="pulse"></span>Waiting for the host to begin…</div>
@@ -5545,7 +5552,7 @@ function createGame(playerInfos,scenario=app.scenario||1){
   const state={version:4,token:uid(),scenario,scenarioName:SCENARIO_NAMES[scenario],round:1,maxRounds:eventIds.length,targetSP:11,phase:"event",phaseStep:"read",firstSeat:0,activeSeat:0,event:null,
     players:playerInfos.map((x,i)=>makePlayer(x,i,scenario)),tradeDeck:makeDeck(buildScenarioMainIds(scenario)),survivorDeck:makeDeck(buildScenarioSurvivorIds(scenario)),eventDeck:eventIds.map(makeInst),
     market:[],survivorRow:[],survivorWaste:[],unluckyUid:null,waste:[],tradeOrder:[],tradePickIndex:0,tradePenalty:0,winnerIds:[],log:[],updatedAt:Date.now(),
-    roundTrashSupplyDamage:0,roundHandPenalty:0,eventActionStartZero:false,roundActionBonus:0,townSquare:false};
+    roundTrashSupplyDamage:0,roundHandPenalty:0,eventActionStartZero:false,roundActionBonus:0,townSquare:false,eventChoices:{}};
   state.players.forEach(p=>drawCards(state,p,5));
   refillSurvivors(state);markUnlucky(state);refillMarket(state);revealEvent(state);logLine(state,`${state.scenarioName} began.`);return state;
 }
@@ -5615,57 +5622,244 @@ function takeBestSurvivor(state,p,toHand=false){
   logLine(state,`${p.name} took ${defOf(card).title} from the Survivor Row.`);
   return true;
 }
-function resetRoundEventFlags(state){state.tradePenalty=0;state.roundTrashSupplyDamage=0;state.roundHandPenalty=0;state.eventActionStartZero=false;state.roundActionBonus=0;state.townSquare=false;state.players.forEach(p=>{p.eventBidBoost=0;p.roundHandPenalty=0;p.roundLifeShield=0;p.usedMedic=false})}
+function resetRoundEventFlags(state){state.tradePenalty=0;state.roundTrashSupplyDamage=0;state.roundHandPenalty=0;state.eventActionStartZero=false;state.roundActionBonus=0;state.townSquare=false;state.eventChoices={};state.players.forEach(p=>{p.eventBidBoost=0;p.roundHandPenalty=0;p.roundLifeShield=0;p.usedMedic=false;p.townSquareChoice=false})}
 function eventBidOrder(state,bids){const order=seatOrder(state);return state.players.slice().sort((a,b)=>(bids[b.id]||0)-(bids[a.id]||0)||order.indexOf(a.seat)-order.indexOf(b.seat))}
+function ensureEventChoiceMap(state){
+  if(!state.eventChoices||Array.isArray(state.eventChoices))state.eventChoices={};
+  return state.eventChoices;
+}
+function queueEventChoice(state,p,choice){
+  const map=ensureEventChoiceMap(state),key=String(p.id);
+  if(!Array.isArray(map[key]))map[key]=[];
+  map[key].push({remaining:1,used:[],...choice});
+}
+function currentEventChoice(state,p){
+  const list=state?.eventChoices?.[String(p?.id)];
+  return Array.isArray(list)&&list.length?list[0]:null;
+}
+function finishEventChoice(state,p){
+  const key=String(p.id),list=state?.eventChoices?.[key];
+  if(!Array.isArray(list))return;
+  list.shift();if(!list.length)delete state.eventChoices[key];
+}
+function hasPendingEventChoices(state){
+  return Object.values(state?.eventChoices||{}).some(list=>Array.isArray(list)&&list.length);
+}
+function pendingEventPlayerNames(state){
+  return state.players.filter(p=>currentEventChoice(state,p)).map(p=>p.name);
+}
+function takeTradeCardByUid(state,p,cardUid){
+  for(let i=0;i<state.market.length;i++){
+    const index=state.market[i].findIndex(c=>c.uid===cardUid);
+    if(index<0)continue;
+    const card=state.market[i].splice(index,1)[0];p.hand.push(card);
+    logLine(state,`${p.name} took ${defOf(card).title} from Trade Pile ${i+1}.`);return true;
+  }
+  return false;
+}
+function eventChoiceOptions(state,p,choice){
+  const supplyCount=p.hand.filter(c=>defOf(c)?.type==="supply").length;
+  const survivorHand=p.hand.filter(c=>defOf(c)?.type==="survivor").length;
+  const buildingHand=p.hand.filter(c=>defOf(c)?.type==="building").length;
+  const loaded=loadedWeapons(p).length;
+  const options=[];
+  switch(choice.kind){
+    case"thieves":return[
+      {id:"discard-supply",label:"Discard 1 Supply",disabled:supplyCount<1},
+      {id:"discard-3",label:"Discard 3 Cards",disabled:p.hand.length<3},
+      {id:"lose-2",label:"Lose 2 Life"}
+    ];
+    case"toughCall":return[
+      {id:"lose-sp",label:"Lose 1 Survival Point",disabled:p.sp<1},
+      {id:"lose-life",label:"Lose 3 Life"},
+      {id:"discard-survivor",label:"Discard a Recruited Survivor",disabled:p.survivors.length<1}
+    ];
+    case"dangerousGamble":
+      options.push({id:"decline",label:"Do Not Take a Card"});
+      state.market.flat().forEach(card=>options.push({id:`take:${card.uid}`,label:`Lose 2 Life • Take ${defOf(card).title}`}));
+      return options;
+    case"savagery":{
+      const max=Math.min(3,supplyCount);for(let n=0;n<=max;n++)options.push({id:`count:${n}`,label:`Discard ${n} Suppl${n===1?"y":"ies"} • Lose ${3-n} Life`});return options;
+    }
+    case"desperation":{
+      const max=Math.min(5,p.hand.length);for(let n=0;n<=max;n++)options.push({id:`count:${n}`,label:`Discard ${n} Card${n===1?"":"s"} • Lose ${5-n} Life`});return options;
+    }
+    case"wrongTurn":return[
+      {id:"discard-supply",label:"Discard 1 Supply",disabled:supplyCount<1},
+      {id:"trash-survivor",label:"Trash a Survivor From Your Hand",disabled:survivorHand<1},
+      {id:"lose-2",label:"Lose 2 Life"}
+    ];
+    case"newWorldOrder":{
+      const max=Math.min(5,Math.max(0,p.health));for(let n=0;n<=max;n++)options.push({id:`draw:${n}`,label:n?`Draw ${n} More • Lose ${n} Life`:"Draw No Extra Cards"});return options;
+    }
+    case"drought":{
+      const card=choice.cards?.[0];if(!card)return[];return[
+        {id:"trash",label:`Trash ${defOf(card).title}`},
+        {id:"keep",label:`Lose 1 Life • Keep ${defOf(card).title} on Top`}
+      ];
+    }
+    case"lifeForSp":return[
+      {id:"accept",label:`Lose ${choice.life||3} Life • Gain ${choice.sp||1} SP`,disabled:p.health<=Number(choice.life||3)},
+      {id:"decline",label:"Decline"}
+    ];
+    case"scavengers":return[
+      {id:"fire",label:"Fire a Weapon • Recover the Top Waste Card",disabled:loaded<1||!state.waste.length},
+      {id:"trash",label:"Do Not Fire • Trash a Card From Your Hand",disabled:p.hand.length<1}
+    ];
+    case"turfWars":{
+      const max=Math.min(4,loaded);for(let n=0;n<=max;n++)options.push({id:`fire:${n}`,label:`Fire ${n} Weapon${n===1?"":"s"} • Discard ${4-n} Card${4-n===1?"":"s"}`});return options;
+    }
+    case"fireOrLose":return[
+      {id:"fire",label:"Fire a Weapon",disabled:loaded<1},
+      {id:"lose",label:`Lose ${choice.life||3} Life`}
+    ];
+    case"unchartedMines":return[
+      {id:"fire",label:"Fire a Weapon",disabled:loaded<1||choice.used.includes("fire")},
+      {id:"discard-survivor",label:"Discard a Survivor From Your Hand",disabled:survivorHand<1||choice.used.includes("discard-survivor")},
+      {id:"lose-1",label:"Lose 1 Life",disabled:choice.used.includes("lose-1")},
+      {id:"lose-2",label:"Lose 2 Life",disabled:choice.used.includes("lose-2")}
+    ];
+    case"radiationSpike":return[
+      {id:"fire",label:"Fire a Weapon",disabled:loaded<1||choice.used.includes("fire")},
+      {id:"discard-building",label:"Discard a Building From Your Hand",disabled:buildingHand<1||choice.used.includes("discard-building")},
+      {id:"discard-survivor",label:"Discard a Survivor From Your Hand",disabled:survivorHand<1||choice.used.includes("discard-survivor")},
+      {id:"lose-2a",label:"Lose 2 Life",disabled:choice.used.includes("lose-2a")},
+      {id:"lose-2b",label:"Lose 2 Life Again",disabled:choice.used.includes("lose-2b")}
+    ];
+    case"mutantAttack":return[
+      {id:"accept",label:"Fire a Weapon + Discard 3 Cards • Gain 1 SP",disabled:loaded<1||p.hand.length<3},
+      {id:"decline",label:"Do Not Gain the SP"}
+    ];
+    case"scrapMetal":{
+      for(let n=0;n<=loaded;n++)options.push({id:`fire:${n}`,label:n?`Fire ${n} Weapon${n===1?"":"s"} • +${n*3} Trade Bid`:"Fire No Weapons"});return options;
+    }
+    case"oldCellar":return[
+      {id:"fire",label:"Fire a Weapon • Recover the Top Supply From Waste",disabled:loaded<1||!state.waste.some(c=>defOf(c)?.type==="supply")},
+      {id:"lose",label:"Lose 3 Life"}
+    ];
+    case"abduction":return[
+      {id:"fire",label:"Fire a Weapon",disabled:loaded<1},
+      {id:"trash",label:"Trash a Card From Your Hand",disabled:p.hand.length<1}
+    ];
+    case"crashSite":return[
+      {id:"discard-survivor",label:"Discard a Recruited Survivor",disabled:p.survivors.length<1||choice.used.includes("discard-survivor")},
+      {id:"discard-building",label:"Discard a Completed Building",disabled:p.buildings.length<1||choice.used.includes("discard-building")},
+      {id:"trash-2",label:"Trash 2 Cards From Your Hand",disabled:p.hand.length<2||choice.used.includes("trash-2")},
+      {id:"lose-3",label:"Lose 3 Life",disabled:choice.used.includes("lose-3")}
+    ];
+    case"emptyCradles":
+      options.push({id:"decline",label:"Do Not Fire"});
+      state.players.filter(x=>x.id!==p.id).forEach(target=>options.push({id:`target:${target.id}`,label:`Fire a Weapon • ${target.name} Loses 2 Life`,disabled:loaded<1}));return options;
+    case"townSquare":return[
+      {id:"fire",label:"Fire a Weapon • Gain 1 Life + 1 Action",disabled:loaded<1},
+      {id:"decline",label:"Do Not Fire"}
+    ];
+    case"flyingSaucer":return[
+      {id:"fire",label:"Fire a Weapon",disabled:loaded<1||choice.used.includes("fire")},
+      {id:"discard-top",label:"Discard the Top 2 Cards of Your Deck",disabled:choice.used.includes("discard-top")},
+      {id:"lose-3",label:"Lose 3 Life",disabled:choice.used.includes("lose-3")},
+      {id:"lose-2",label:"Lose 2 Life",disabled:choice.used.includes("lose-2")}
+    ];
+    case"scavengerAbility":return[
+      {id:"accept",label:"Discard 1 Card • Draw 2 Cards",disabled:p.hand.length<1},
+      {id:"decline",label:"Do Not Use Scavenger"}
+    ];
+  }
+  return[];
+}
+function resolveEventChoice(state,p,choiceId){
+  const choice=currentEventChoice(state,p);if(!choice)return false;
+  const option=eventChoiceOptions(state,p,choice).find(x=>x.id===choiceId&&!x.disabled);if(!option)return false;
+  const title=defOf(state.event)?.title||"Event";
+  let complete=true;
+  const useStep=()=>{choice.used.push(choiceId);choice.remaining=Math.max(0,Number(choice.remaining||1)-1);complete=choice.remaining<=0};
+  switch(choice.kind){
+    case"thieves":if(choiceId==="discard-supply")discardLowest(state,p,1,c=>defOf(c)?.type==="supply");else if(choiceId==="discard-3")discardLowest(state,p,3);else damage(state,p,2,title);break;
+    case"toughCall":if(choiceId==="lose-sp"){p.sp=Math.max(0,p.sp-1);logLine(state,`${p.name} lost 1 SP.`)}else if(choiceId==="discard-survivor")removeRandomColonyCard(state,p,"survivor");else damage(state,p,3,title);break;
+    case"dangerousGamble":if(choiceId.startsWith("take:")){const id=choiceId.slice(5);if(!takeTradeCardByUid(state,p,id))return false;damage(state,p,2,title)}break;
+    case"savagery":{const n=Number(choiceId.split(":")[1]||0);discardLowest(state,p,n,c=>defOf(c)?.type==="supply");damage(state,p,Math.max(0,3-n),title);break}
+    case"desperation":{const n=Number(choiceId.split(":")[1]||0);discardLowest(state,p,n);damage(state,p,Math.max(0,5-n),title);break}
+    case"wrongTurn":if(choiceId==="discard-supply")discardLowest(state,p,1,c=>defOf(c)?.type==="supply");else if(choiceId==="trash-survivor")trashLowest(state,p,1,c=>defOf(c)?.type==="survivor");else damage(state,p,2,title);break;
+    case"newWorldOrder":{const n=Number(choiceId.split(":")[1]||0);drawCards(state,p,n);damage(state,p,n,title);break}
+    case"drought":{
+      const card=choice.cards.shift();if(!card)return false;
+      if(choiceId==="trash")trashCard(state,p,card);else{damage(state,p,1,title);choice.kept.push(card)}
+      complete=!choice.cards.length;
+      if(complete&&choice.kept.length)p.deck.unshift(...choice.kept);
+      break;
+    }
+    case"lifeForSp":if(choiceId==="accept"){damage(state,p,choice.life||3,title);p.sp+=Number(choice.sp||1);logLine(state,`${p.name} gained ${choice.sp||1} SP.`)}break;
+    case"scavengers":if(choiceId==="fire"){fireWeapon(state,p);takeWasteSupply(state,p)}else trashLowest(state,p,1);break;
+    case"turfWars":{const n=Number(choiceId.split(":")[1]||0);for(let i=0;i<n;i++)fireWeapon(state,p);discardLowest(state,p,Math.max(0,4-n));break}
+    case"fireOrLose":if(choiceId==="fire")fireWeapon(state,p);else damage(state,p,choice.life||3,title);break;
+    case"unchartedMines":if(choiceId==="fire")fireWeapon(state,p);else if(choiceId==="discard-survivor")discardLowest(state,p,1,c=>defOf(c)?.type==="survivor");else damage(state,p,choiceId==="lose-1"?1:2,title);useStep();break;
+    case"radiationSpike":if(choiceId==="fire")fireWeapon(state,p);else if(choiceId==="discard-building")discardLowest(state,p,1,c=>defOf(c)?.type==="building");else if(choiceId==="discard-survivor")discardLowest(state,p,1,c=>defOf(c)?.type==="survivor");else damage(state,p,2,title);useStep();break;
+    case"mutantAttack":if(choiceId==="accept"){fireWeapon(state,p);discardLowest(state,p,3);p.sp++;logLine(state,`${p.name} gained 1 SP.`)}break;
+    case"scrapMetal":{const n=Number(choiceId.split(":")[1]||0);for(let i=0;i<n;i++)fireWeapon(state,p);p.eventBidBoost+=n*3;break}
+    case"oldCellar":if(choiceId==="fire"){fireWeapon(state,p);takeWasteSupply(state,p)}else damage(state,p,3,title);break;
+    case"abduction":if(choiceId==="fire")fireWeapon(state,p);else trashLowest(state,p,1);choice.remaining=Math.max(0,Number(choice.remaining||2)-1);complete=choice.remaining<=0;break;
+    case"crashSite":if(choiceId==="discard-survivor")removeRandomColonyCard(state,p,"survivor");else if(choiceId==="discard-building")removeRandomColonyCard(state,p,"building");else if(choiceId==="trash-2")trashLowest(state,p,2);else damage(state,p,3,title);useStep();break;
+    case"emptyCradles":if(choiceId.startsWith("target:")){const target=state.players.find(x=>x.id===choiceId.slice(7));if(!target||!fireWeapon(state,p))return false;damage(state,target,2,title)}break;
+    case"townSquare":p.townSquareChoice=choiceId==="fire";break;
+    case"flyingSaucer":if(choiceId==="fire")fireWeapon(state,p);else if(choiceId==="discard-top"){const cards=takePersonalCards(state,p,2);p.discard.push(...cards)}else damage(state,p,choiceId==="lose-3"?3:2,title);useStep();break;
+    case"scavengerAbility":if(choiceId==="accept"){discardLowest(state,p,1);drawCards(state,p,2)}break;
+    default:return false;
+  }
+  logLine(state,`${p.name} chose “${option.label}” for ${title}.`);
+  if(complete)finishEventChoice(state,p);
+  return true;
+}
 function applyEvent(state,inst){
   const d=defOf(inst),kind=d?.event?.kind||"";
   state.players.forEach(p=>{const h=hasOngoing(p,"eventHeal");if(h)heal(state,p,h)});
+  const human=(p,choice,botAction)=>{if(p.isBot){botAction();return}queueEventChoice(state,p,choice)};
   switch(kind){
     case"healPerLoaded":state.players.forEach(p=>heal(state,p,Math.min(d.event.max||3,loadedWeapons(p).length)));break;
-    case"thieves":state.players.forEach(p=>{if(discardLowest(state,p,1,c=>defOf(c)?.type==="supply"))return;if(p.hand.length>=3){discardLowest(state,p,3);return}damage(state,p,2,d.title)});break;
+    case"thieves":state.players.forEach(p=>human(p,{kind:"thieves"},()=>{if(discardLowest(state,p,1,c=>defOf(c)?.type==="supply"))return;if(p.hand.length>=3){discardLowest(state,p,3);return}damage(state,p,2,d.title)}));break;
     case"trashSupplyDamage":state.roundTrashSupplyDamage=d.event.amount||1;break;
-    case"toughCall":state.players.forEach(p=>{if(p.sp>0){p.sp--;logLine(state,`${p.name} lost 1 SP.`)}else if(!removeRandomColonyCard(state,p,"survivor"))damage(state,p,3,d.title)});break;
+    case"toughCall":state.players.forEach(p=>human(p,{kind:"toughCall"},()=>{if(p.sp>0){p.sp--;logLine(state,`${p.name} lost 1 SP.`)}else if(!removeRandomColonyCard(state,p,"survivor"))damage(state,p,3,d.title)}));break;
     case"goingCrazy":state.roundHandPenalty=2;state.players.forEach(p=>{p.roundHandPenalty=2;damage(state,p,2,d.title)});break;
-    case"dangerousGamble":state.players.forEach(p=>{if(p.health>2&&takeBestPublicCard(state,p,true,false,false))damage(state,p,2,d.title)});break;
-    case"savagery":state.players.forEach(p=>{const n=discardLowest(state,p,3,c=>defOf(c)?.type==="supply");damage(state,p,Math.max(0,3-n),d.title)});break;
-    case"desperation":state.players.forEach(p=>{const n=discardLowest(state,p,Math.min(5,p.hand.length));damage(state,p,Math.max(0,5-n),d.title)});break;
+    case"dangerousGamble":state.players.forEach(p=>human(p,{kind:"dangerousGamble"},()=>{if(p.health>2&&takeBestPublicCard(state,p,true,false,false))damage(state,p,2,d.title)}));break;
+    case"savagery":state.players.forEach(p=>human(p,{kind:"savagery"},()=>{const n=discardLowest(state,p,3,c=>defOf(c)?.type==="supply");damage(state,p,Math.max(0,3-n),d.title)}));break;
+    case"desperation":state.players.forEach(p=>human(p,{kind:"desperation"},()=>{const n=discardLowest(state,p,Math.min(5,p.hand.length));damage(state,p,Math.max(0,5-n),d.title)}));break;
     case"alliesFoes":state.roundActionBonus=1;state.players.forEach(p=>{drawCards(state,p,2);damage(state,p,2,d.title)});break;
-    case"wrongTurn":state.players.forEach(p=>{if(discardLowest(state,p,1,c=>defOf(c)?.type==="supply"))return;if(trashLowest(state,p,1,c=>defOf(c)?.type==="survivor"))return;damage(state,p,2,d.title)});break;
+    case"wrongTurn":state.players.forEach(p=>human(p,{kind:"wrongTurn"},()=>{if(discardLowest(state,p,1,c=>defOf(c)?.type==="supply"))return;if(trashLowest(state,p,1,c=>defOf(c)?.type==="survivor"))return;damage(state,p,2,d.title)}));break;
     case"surpriseAttack":state.eventActionStartZero=true;break;
-    case"newWorldOrder":state.players.forEach(p=>{p.deck=shuffle([...p.hand.splice(0),...p.deck.splice(0),...p.discard.splice(0)]);drawCards(state,p,2)});break;
-    case"drought":state.players.forEach(p=>{const cards=p.deck.splice(0,2),keep=[];cards.forEach(c=>{const score=Number(defOf(c).trade||0)+Number(defOf(c).value||0);if(score>=3&&p.health>1){damage(state,p,1,d.title);keep.push(c)}else trashCard(state,p,c)});p.deck.unshift(...keep)});break;
-    case"lifeForSp":state.players.forEach(p=>{if(p.health>d.event.life){damage(state,p,d.event.life,d.title);p.sp+=d.event.sp;logLine(state,`${p.name} gained ${d.event.sp} SP.`)}});break;
-    case"scavengers":state.players.forEach(p=>{if(fireWeapon(state,p))takeWasteSupply(state,p);else trashLowest(state,p,1)});break;
-    case"turfWars":state.players.forEach(p=>{let fired=0;while(fired<4&&fireWeapon(state,p))fired++;discardLowest(state,p,Math.max(0,4-fired))});break;
+    case"newWorldOrder":state.players.forEach(p=>{p.deck=shuffle([...p.hand.splice(0),...p.deck.splice(0),...p.discard.splice(0)]);drawCards(state,p,2);if(p.isBot)return;queueEventChoice(state,p,{kind:"newWorldOrder"})});break;
+    case"drought":state.players.forEach(p=>{const cards=p.deck.splice(0,2);if(p.isBot){const keep=[];cards.forEach(c=>{const score=Number(defOf(c).trade||0)+Number(defOf(c).value||0);if(score>=3&&p.health>1){damage(state,p,1,d.title);keep.push(c)}else trashCard(state,p,c)});p.deck.unshift(...keep)}else if(cards.length)queueEventChoice(state,p,{kind:"drought",cards,kept:[]})});break;
+    case"lifeForSp":state.players.forEach(p=>human(p,{kind:"lifeForSp",life:d.event.life,sp:d.event.sp},()=>{if(p.health>d.event.life){damage(state,p,d.event.life,d.title);p.sp+=d.event.sp;logLine(state,`${p.name} gained ${d.event.sp} SP.`)}}));break;
+    case"scavengers":state.players.forEach(p=>human(p,{kind:"scavengers"},()=>{if(fireWeapon(state,p))takeWasteSupply(state,p);else trashLowest(state,p,1)}));break;
+    case"turfWars":state.players.forEach(p=>human(p,{kind:"turfWars"},()=>{let fired=0;while(fired<4&&fireWeapon(state,p))fired++;discardLowest(state,p,Math.max(0,4-fired))}));break;
     case"raiders":state.players.forEach(p=>{const count=p.buildings.length;for(let i=0;i<count;i++){if(!fireWeapon(state,p))removeRandomColonyCard(state,p,"building")}});break;
     case"noHonor":state.players.forEach(p=>{const count=p.survivors.length;for(let i=0;i<count;i++){if(!fireWeapon(state,p))damage(state,p,2,d.title)}});break;
-    case"fireOrLose":state.players.forEach(p=>{if(!fireWeapon(state,p))damage(state,p,d.event.life,d.title)});break;
-    case"unchartedMines":state.players.forEach(p=>{let choices=0;if(fireWeapon(state,p))choices++;if(choices<2&&discardLowest(state,p,1,c=>defOf(c)?.type==="survivor"))choices++;while(choices<2){damage(state,p,choices===0?1:2,d.title);choices++}});break;
-    case"radiationSpike":state.players.forEach(p=>{let choices=0;if(fireWeapon(state,p))choices++;if(choices<2&&discardLowest(state,p,1,c=>defOf(c)?.type==="building"))choices++;if(choices<2&&discardLowest(state,p,1,c=>defOf(c)?.type==="survivor"))choices++;while(choices<2){damage(state,p,2,d.title);choices++}});break;
-    case"mutantAttack":state.players.forEach(p=>{damage(state,p,2,d.title);if(loadedWeapons(p).length&&p.hand.length>=3){fireWeapon(state,p);discardLowest(state,p,3);p.sp++;logLine(state,`${p.name} gained 1 SP.`)}});break;
-    case"scrapMetal":state.players.forEach(p=>{let fired=0;while(fireWeapon(state,p))fired++;p.eventBidBoost+=fired*3});break;
-    case"oldCellar":state.players.forEach(p=>{if(fireWeapon(state,p))takeWasteSupply(state,p);else damage(state,p,3,d.title)});break;
+    case"fireOrLose":state.players.forEach(p=>human(p,{kind:"fireOrLose",life:d.event.life},()=>{if(!fireWeapon(state,p))damage(state,p,d.event.life,d.title)}));break;
+    case"unchartedMines":state.players.forEach(p=>human(p,{kind:"unchartedMines",remaining:2,used:[]},()=>{let choices=0;if(fireWeapon(state,p))choices++;if(choices<2&&discardLowest(state,p,1,c=>defOf(c)?.type==="survivor"))choices++;while(choices<2){damage(state,p,choices===0?1:2,d.title);choices++}}));break;
+    case"radiationSpike":state.players.forEach(p=>human(p,{kind:"radiationSpike",remaining:2,used:[]},()=>{let choices=0;if(fireWeapon(state,p))choices++;if(choices<2&&discardLowest(state,p,1,c=>defOf(c)?.type==="building"))choices++;if(choices<2&&discardLowest(state,p,1,c=>defOf(c)?.type==="survivor"))choices++;while(choices<2){damage(state,p,2,d.title);choices++}}));break;
+    case"mutantAttack":state.players.forEach(p=>{damage(state,p,2,d.title);human(p,{kind:"mutantAttack"},()=>{if(loadedWeapons(p).length&&p.hand.length>=3){fireWeapon(state,p);discardLowest(state,p,3);p.sp++;logLine(state,`${p.name} gained 1 SP.`)}})});break;
+    case"scrapMetal":state.players.forEach(p=>human(p,{kind:"scrapMetal"},()=>{let fired=0;while(fireWeapon(state,p))fired++;p.eventBidBoost+=fired*3}));break;
+    case"oldCellar":state.players.forEach(p=>human(p,{kind:"oldCellar"},()=>{if(fireWeapon(state,p))takeWasteSupply(state,p);else damage(state,p,3,d.title)}));break;
     case"lifeBidCards":{const bids={};state.players.forEach(p=>{bids[p.id]=p.health>2?1:0;if(bids[p.id])damage(state,p,bids[p.id],d.title)});eventBidOrder(state,bids).forEach(p=>{if(bids[p.id]>0)takeBestPublicCard(state,p,true,false)});break}
-    case"topDog":{state.players.forEach(p=>damage(state,p,1,d.title));const bids={};state.players.forEach(p=>{bids[p.id]=fireWeapon(state,p)?1:0});const ranked=eventBidOrder(state,bids),winner=ranked[0],loser=[...ranked].reverse().find(p=>p.hand.length);if(winner&&loser&&winner!==loser&&loser.hand.length){const card=loser.hand.splice(Math.floor(Math.random()*loser.hand.length),1)[0];winner.hand.push(card);logLine(state,`${winner.name} took a random card from ${loser.name}.`) }break}
+    case"topDog":{state.players.forEach(p=>damage(state,p,1,d.title));const bids={};state.players.forEach(p=>{bids[p.id]=fireWeapon(state,p)?1:0});const ranked=eventBidOrder(state,bids),winner=ranked[0],loser=[...ranked].reverse().find(p=>p.hand.length);if(winner&&loser&&winner!==loser&&loser.hand.length){const card=loser.hand.splice(Math.floor(Math.random()*loser.hand.length),1)[0];winner.hand.push(card);logLine(state,`${winner.name} took a random card from ${loser.name}.`)}break}
     case"bulletBidCards":{state.players.forEach(p=>damage(state,p,1,d.title));const bids={};state.players.forEach(p=>{bids[p.id]=fireWeapon(state,p)?1:0});eventBidOrder(state,bids).forEach(p=>{if(bids[p.id])takeBestPublicCard(state,p,true,false)});break}
     case"goodLife":{state.players.forEach(p=>damage(state,p,1,d.title));const bids={};state.players.forEach(p=>{bids[p.id]=fireWeapon(state,p)?1:0});const delta=[1,0,0,-1,-1];eventBidOrder(state,bids).forEach((p,i)=>p.eventActionDelta=delta[i]||0);break}
     case"mcdonaldsFarm":{const fired=new Set(state.players.filter(p=>fireWeapon(state,p)).map(p=>p.id)),n=fired.size;state.players.filter(p=>!fired.has(p.id)).forEach(p=>{discardLowest(state,p,n);damage(state,p,n,d.title)});break}
-    case"abduction":state.players.forEach(p=>{for(let i=0;i<2;i++)if(!fireWeapon(state,p))trashLowest(state,p,1)});break;
+    case"abduction":state.players.forEach(p=>human(p,{kind:"abduction",remaining:2},()=>{for(let i=0;i<2;i++)if(!fireWeapon(state,p))trashLowest(state,p,1)}));break;
     case"cropCircles":{state.players.forEach(p=>damage(state,p,2,d.title));const chosen=[...state.players].sort((a,b)=>a.sp-b.sp||a.health-b.health)[0];state.players.forEach(p=>{const card=drawFromMain(state);if(card)p.deck.unshift(card)});if(chosen)logLine(state,`${chosen.name} distributed cards after the Crop Circles event.`);break}
-    case"crashSite":state.players.forEach(p=>{let done=0;if(removeRandomColonyCard(state,p,"survivor"))done++;if(done<2&&removeRandomColonyCard(state,p,"building"))done++;if(done<2&&trashLowest(state,p,2)>0)done++;if(done<2)damage(state,p,3,d.title)});break;
-    case"emptyCradles":state.players.forEach((p,i)=>{if(fireWeapon(state,p))damage(state,state.players[(i+1)%state.players.length],2,d.title)});break;
-    case"townSquare":state.townSquare=true;break;
-    case"flyingSaucer":state.players.forEach(p=>{let done=0;if(fireWeapon(state,p))done++;if(done<2){const cards=p.deck.splice(0,2);cards.forEach(c=>p.discard.push(c));done++}if(done<2){damage(state,p,2,d.title);done++}});break;
+    case"crashSite":state.players.forEach(p=>human(p,{kind:"crashSite",remaining:2,used:[]},()=>{let done=0;if(removeRandomColonyCard(state,p,"survivor"))done++;if(done<2&&removeRandomColonyCard(state,p,"building"))done++;if(done<2&&trashLowest(state,p,2)>0)done++;if(done<2)damage(state,p,3,d.title)}));break;
+    case"emptyCradles":state.players.forEach((p,i)=>human(p,{kind:"emptyCradles"},()=>{if(fireWeapon(state,p))damage(state,state.players[(i+1)%state.players.length],2,d.title)}));break;
+    case"townSquare":state.townSquare=true;state.players.forEach(p=>human(p,{kind:"townSquare"},()=>{p.townSquareChoice=loadedWeapons(p).length>0}));break;
+    case"flyingSaucer":state.players.forEach(p=>human(p,{kind:"flyingSaucer",remaining:2,used:[]},()=>{let done=0;if(fireWeapon(state,p))done++;if(done<2){const cards=p.deck.splice(0,2);cards.forEach(c=>p.discard.push(c));done++}if(done<2){damage(state,p,2,d.title);done++}}));break;
   }
-  state.players.forEach(p=>{const bonus=hasOngoing(p,"eventDiscardDraw");if(bonus&&p.hand.length){discardLowest(state,p,1);drawCards(state,p,bonus)}});
+  state.players.forEach(p=>{const bonus=hasOngoing(p,"eventDiscardDraw");if(bonus&&p.hand.length){if(p.isBot){discardLowest(state,p,1);drawCards(state,p,bonus)}else queueEventChoice(state,p,{kind:"scavengerAbility"})}});
 }
 function revealEvent(state){
   resetRoundEventFlags(state);state.event=state.eventDeck.shift()||null;state.phase="event";state.phaseStep="read";state.activeSeat=state.firstSeat;
   if(state.event){applyEvent(state,state.event);logLine(state,`Event revealed: ${defOf(state.event).title}.`)}
 }
 function beginActionPhase(state){
+  if(hasPendingEventChoices(state))return false;
   state.phase="action";state.phaseStep="turn";state.players.forEach(p=>{p.actionDone=false;p.roundBidBoost=0;p.actionsLeft=state.eventActionStartZero?0:Math.max(0,1+hasOngoing(p,"extraActions")+Number(state.roundActionBonus||0)+Number(p.eventActionDelta||0));p.eventActionDelta=0;
-    if(state.townSquare&&fireWeapon(state,p)){heal(state,p,1);p.actionsLeft++}});state.activeSeat=state.firstSeat;logLine(state,`Round ${state.round} Action phase began.`)
+    if(state.townSquare&&p.townSquareChoice&&fireWeapon(state,p)){heal(state,p,1);p.actionsLeft++}p.townSquareChoice=false});state.activeSeat=state.firstSeat;logLine(state,`Round ${state.round} Action phase began.`);return true
 }
 function advanceActionTurn(state){
   const p=activePlayer(state);if(p){p.actionDone=true;refillHand(state,p)}
@@ -5741,7 +5935,8 @@ function applyGameAction(playerId,action){
     logLine(state,`${p.name} selected ${defOf(chosen).title} to rescue when their empty Draw deck is rebuilt.`);
     return true
   }
-  if(action.type==="begin-action"){if(!isHost()||state.phase!=="event")return false;beginActionPhase(state);return true}
+  if(action.type==="event-choice"){if(state.phase!=="event")return false;return resolveEventChoice(state,p,String(action.choiceId||""))}
+  if(action.type==="begin-action"){if(!isHost()||state.phase!=="event"||hasPendingEventChoices(state))return false;return beginActionPhase(state)}
   if(action.type==="restart"){if(!isHost())return false;app.state=createGame(state.players.map(x=>({id:x.id,name:x.name,isBot:x.isBot})),state.scenario);return true}
   if(action.type==="use-ammunition"){
     const ammo=p.hand.find(c=>c.uid===action.cardUid&&c.defId==="ammunition")||p.hand.find(c=>c.defId==="ammunition");if(!ammo||!weaponCards(p).some(w=>Number(w.bullets||0)<Number(defOf(w).maxBullets||1)))return false;
@@ -6018,7 +6213,7 @@ function applyRemoteAction(playerId,action){
 }
 
 function roomInfoPayload(){
-  return {hostId:app.hostId,totalSeats:app.totalSeats,botCount:app.botCount,scenario:app.scenario,players:app.humans,started:app.started,state:app.started?app.state:null};
+  return {hostId:app.hostId,totalSeats:app.totalSeats,scenario:app.scenario,players:app.humans,started:app.started,state:app.started?app.state:null};
 }
 function presencePlayers(){
   if(!app.channel)return[];
@@ -6069,12 +6264,12 @@ async function connectRoom(code,creating){
    .on("broadcast",{event:"humanity-room-request-info"},m=>{const p=m.payload||{};if(p.roomCode!==app.roomCode||!isHost())return;send("humanity-room-info",roomInfoPayload())})
    .on("broadcast",{event:"humanity-room-info"},m=>{
       const p=m.payload||{};if(p.roomCode!==app.roomCode)return;
-      if(p.hostId)app.hostId=String(p.hostId);app.totalSeats=Math.max(2,Math.min(5,Number(p.totalSeats||3)));app.botCount=Math.max(0,Math.min(4,Number(p.botCount||0)));app.scenario=Math.max(1,Math.min(3,Number(p.scenario||1)));
+      if(p.hostId)app.hostId=String(p.hostId);app.totalSeats=Math.max(2,Math.min(5,Number(p.totalSeats||3)));app.scenario=Math.max(1,Math.min(3,Number(p.scenario||1)));
       if(Array.isArray(p.players))app.humans=p.players;
       if(p.started&&p.state){app.started=true;app.state=p.state;showScreen("gameScreen");renderGame();maybeRunBots()}else{showScreen("lobbyScreen");renderLobby()}
    })
    .on("broadcast",{event:"humanity-room-host"},m=>{const p=m.payload||{};if(p.roomCode!==app.roomCode||!p.hostId)return;app.hostId=String(p.hostId);renderLobby();renderGame()})
-   .on("broadcast",{event:"humanity-room-settings"},m=>{const p=m.payload||{};if(p.roomCode!==app.roomCode)return;app.totalSeats=p.totalSeats;app.botCount=p.botCount;app.scenario=Math.max(1,Math.min(3,Number(p.scenario||1)));renderLobby()})
+   .on("broadcast",{event:"humanity-room-settings"},m=>{const p=m.payload||{};if(p.roomCode!==app.roomCode)return;app.totalSeats=p.totalSeats;app.scenario=Math.max(1,Math.min(3,Number(p.scenario||1)));renderLobby()})
    .on("broadcast",{event:"humanity-room-start"},m=>{const p=m.payload||{};if(p.roomCode!==app.roomCode)return;app.hostId=p.hostId||app.hostId;app.started=true;app.state=p.state;showScreen("gameScreen");renderGame();maybeRunBots()})
    .on("broadcast",{event:"humanity-state"},m=>{const p=m.payload||{};if(p.roomCode!==app.roomCode||!p.state)return;app.hostId=p.hostId||app.hostId;app.started=true;app.state=p.state;showScreen("gameScreen");renderGame();maybeRunBots()})
    .on("broadcast",{event:"humanity-action"},m=>{const p=m.payload||{};if(p.roomCode!==app.roomCode||!p.playerId||!p.action)return;applyRemoteAction(p.playerId,p.action)})
@@ -6105,15 +6300,16 @@ function startLocal(){
 }
 function startHostedGame(){
   if(!isHost())return;
-  const humans=app.humans.slice(0,Math.max(1,app.totalSeats-app.botCount));
-  const infos=humans.map(x=>({id:x.id,name:x.name,isBot:false}));
   const desired=Math.max(2,Math.min(5,app.totalSeats));
+  const humans=app.humans.slice(0,desired);
+  const infos=humans.map(x=>({id:x.id,name:x.name,isBot:false}));
   const botNames=["Vicki","Mara","Jonah","Iris","Cal"];
   let botIndex=0;
   while(infos.length<desired){
     infos.push({id:"bot-"+infos.length,name:botNames[botIndex]||("Bot "+(botIndex+1)),isBot:true});
     botIndex+=1;
   }
+  app.botCount=Math.max(0,desired-humans.length);
   app.state=createGame(infos,app.scenario);app.started=true;
   if(!app.localMode)send("humanity-room-start",{hostId:app.hostId,state:app.state});showScreen("gameScreen");renderGame();maybeRunBots();
 }
@@ -6169,13 +6365,12 @@ function renderLobby(){
   $("lobbyPlayers").innerHTML=players.map((p,i)=>`<div class="player-chip"><span class="player-dot" style="background:${COLORS[i%COLORS.length]}">${escapeHtml((p.name||"?")[0].toUpperCase())}</span><div class="name">${escapeHtml(p.name)}<small>${p.id===app.hostId?"HOST":p.id===app.id?"YOU":"CONNECTED"}</small></div></div>`).join("");
   $("hostSettings").classList.toggle("hidden",!isHost());
   $("guestWaiting").classList.toggle("hidden",isHost());
-  $("seatCount").textContent=app.totalSeats;$("botCount").textContent=app.botCount;
-  $("scenarioNameDisplay").textContent=SCENARIO_NAMES[app.scenario]||SCENARIO_NAMES[1];
+  app.totalSeats=Math.max(2,Math.min(5,Math.max(app.totalSeats,players.length)));
+  $("seatCount").textContent=app.totalSeats;
   if($("scenarioSelect"))$("scenarioSelect").value=String(app.scenario);
-  $("botPlus").disabled=app.botCount>=4||app.botCount>=app.totalSeats-1;
-  $("botMinus").disabled=app.botCount<=0;
-  $("seatMinus").disabled=app.totalSeats<=2;$("seatPlus").disabled=app.totalSeats>=5;
-  $("startGameButton").disabled=isHost()&&Math.max(players.length+app.botCount,app.totalSeats)<2;
+  $("seatMinus").disabled=app.totalSeats<=Math.max(2,players.length);
+  $("seatPlus").disabled=app.totalSeats>=5;
+  $("startGameButton").disabled=!isHost()||players.length>app.totalSeats;
   updateChatBadges();
 }
 function renderPlayersStrip(state){
@@ -6290,6 +6485,45 @@ function renderGameOverWorkspace(state){
   return `<div class="phase-workspace-head"><b>Final Survival Count</b><span>Highest Survival Points wins</span></div>
     <div class="score-board">${[...state.players].sort((a,b)=>b.sp-a.sp||b.health-a.health).map(p=>`<div class="score-line"><span class="player-dot" style="background:${p.color}">${escapeHtml(p.name[0])}</span><b>${escapeHtml(p.name)}${state.winnerIds.includes(p.id)?" — Winner":""}</b><strong>★ ${p.sp}</strong></div>`).join("")}</div>`;
 }
+function eventChoiceHeading(choice){
+  const map={
+    thieves:"Choose how to handle the thieves",
+    toughCall:"Make the tough call",
+    dangerousGamble:"Take the gamble or decline",
+    savagery:"Choose how many Supplies to discard",
+    desperation:"Choose how many cards to discard",
+    wrongTurn:"Choose one consequence",
+    newWorldOrder:"Choose whether to draw extra cards",
+    drought:"Choose what happens to this card",
+    lifeForSp:"Choose whether to trade Life for SP",
+    scavengers:"Choose whether to fire a Weapon",
+    turfWars:"Choose how many Weapons to fire",
+    fireOrLose:"Choose one",
+    unchartedMines:"Choose two different options",
+    radiationSpike:"Choose two different options",
+    mutantAttack:"Choose whether to fight back",
+    scrapMetal:"Choose how many Weapons to fire",
+    oldCellar:"Choose one",
+    abduction:"Choose twice",
+    crashSite:"Choose two different options",
+    emptyCradles:"Choose whether to fire—and at whom",
+    townSquare:"Choose whether to fire at the start of Action",
+    flyingSaucer:"Choose two different options",
+    scavengerAbility:"Use the Scavenger ability?"
+  };return map[choice?.kind]||"Choose how to resolve this Event";
+}
+function renderEventChoicePanel(state,p){
+  if(!p||state.phase!=="event")return"";
+  const choice=currentEventChoice(state,p);
+  if(choice){
+    const options=eventChoiceOptions(state,p,choice);
+    const steps=Number(choice.remaining||1)>1?` • ${choice.remaining} choice${choice.remaining===1?"":"s"} remaining`:"";
+    return `<section class="event-choice-panel"><h3>${escapeHtml(eventChoiceHeading(choice))}</h3><p>Your decision is required before the Action phase can begin${escapeHtml(steps)}.</p><div class="event-choice-buttons">${options.map(option=>`<button class="event-choice-button" data-event-choice="${escapeHtml(option.id)}"${option.disabled?" disabled":""}>${escapeHtml(option.label)}</button>`).join("")}</div></section>`;
+  }
+  const waiting=pendingEventPlayerNames(state);
+  if(waiting.length)return `<div class="event-choice-wait">Waiting for ${escapeHtml(waiting.join(", "))} to resolve the Event.</div>`;
+  return"";
+}
 function renderPhaseWorkspace(state,p){
   const ev=defOf(state.event);
   if(state.phase==="gameover")return renderGameOverWorkspace(state);
@@ -6305,7 +6539,7 @@ function renderPhaseWorkspace(state,p){
   if(state.phase==="recruit")return renderPhoneHand(state,p,"Recruit From Your Hand","Select a Survivor, then select enough Supply cards to pay its COST");
   return `<div class="phase-workspace-head"><b>${phaseLabel(state)} Phase</b><span>Tap the event to read it full-screen</span></div>
     <div class="phase-hint">${escapeHtml(currentMessage(state,p))}</div>
-    <div class="phase-event" data-open-card="${state.event?.uid||""}"><div class="event-card-wide"><div class="event-art" style="background-image:url('${ART.event}')"></div><div class="event-copy"><div class="eyebrow">CURRENT EVENT</div><h2>${escapeHtml(ev?.title||"No Event")}</h2><p>${escapeHtml(ev?.effect||"")}</p></div></div></div>`;
+    <div class="phase-event" data-open-card="${state.event?.uid||""}"><div class="event-card-wide"><div class="event-art" style="background-image:url('${ART.event}')"></div><div class="event-copy"><div class="eyebrow">CURRENT EVENT</div><h2>${escapeHtml(ev?.title||"No Event")}</h2><p>${escapeHtml(ev?.effect||"")}</p></div></div></div>${renderEventChoicePanel(state,p)}`;
 }
 function restoreFocusedHandCard(){
   const uidValue=app.ui.focusCardUid;
@@ -6362,7 +6596,10 @@ function currentMessage(state,p){
   const current=activePlayer(state);
   if(state.phase==="event"){
     const peek=p&&hasOngoing(p,"peekEvent")&&state.eventDeck[0]?` Next Event: ${defOf(state.eventDeck[0]).title}.`:"";
-    return (isHost()?"Read the Event, then begin the Action phase.":"Waiting for the host to begin the Action phase.")+peek;
+    if(p&&currentEventChoice(state,p))return "Choose how your colony will resolve this Event."+peek;
+    const waiting=pendingEventPlayerNames(state);
+    if(waiting.length)return `Waiting for ${waiting.join(", ")} to choose.`+peek;
+    return (isHost()?"All Event choices are complete. Begin the Action phase.":"Waiting for the host to begin the Action phase.")+peek;
   }
   if(state.phase==="action")return current?.id===app.id?`You have ${Math.max(0,p?.actionsLeft||0)} Action${Number(p?.actionsLeft||0)===1?"":"s"} remaining.`:`${current?.name||"A player"} is taking their Action turn.`;
   if(state.phase==="trade"&&state.phaseStep==="bid")return p?.bidSubmitted?"Your bid is locked. Waiting for everyone else.":"Select cards showing a TRADE value, including Supply cards, then submit your secret bid.";
@@ -6373,7 +6610,7 @@ function currentMessage(state,p){
 }
 function renderControls(state,p){
   const current=activePlayer(state),mine=current&&current.id===app.id;let buttons="";
-  if(state.phase==="event"&&isHost())buttons=`<button class="primary" data-act="begin-action">Begin Action</button>`;
+  if(state.phase==="event"&&isHost()&&!hasPendingEventChoices(state))buttons=`<button class="primary" data-act="begin-action">Begin Action</button>`;
   else if(state.phase==="action"&&mine){
     const selected=[...app.ui.selected].map(id=>p.hand.find(c=>c.uid===id)).filter(Boolean),actionCard=selected.find(c=>defOf(c).type==="action"),buildingCard=selected.find(c=>defOf(c).type==="building"),ammoCard=selected.find(c=>c.defId==="ammunition"),supplies=selected.filter(c=>defOf(c).type==="supply"),supplyValue=supplies.reduce((n,c)=>n+Number(defOf(c).value||0),0),hasUnloaded=weaponCards(p).some(w=>Number(w.bullets||0)<Number(defOf(w).maxBullets||1));
     if(p.actionsLeft<=0&&state.eventActionStartZero&&p.health>0)buttons+=`<button class="primary" data-act="buy-action">Lose 1 Life • Gain 1 Action</button>`;
@@ -6456,6 +6693,7 @@ function bindGameInteractions(){
   document.querySelectorAll("[data-player-view]").forEach(btn=>btn.onclick=()=>openCollection(`player:${btn.dataset.playerView}`,0));
   document.querySelectorAll("[data-open-card]").forEach(el=>el.onclick=()=>{if(el.dataset.openCard)openCard(el.dataset.openCard)});
   document.querySelectorAll("[data-pile-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("pick-trade",{pileIndex:Number(btn.dataset.pileChoice)})});
+  document.querySelectorAll("[data-event-choice]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();requestAction("event-choice",{choiceId:btn.dataset.eventChoice})});
   document.querySelectorAll(".card-info").forEach(btn=>btn.onclick=e=>{e.stopPropagation();openCard(btn.dataset.info)});
   document.querySelectorAll('.game-card[data-context="hand"]').forEach(card=>card.onclick=e=>{
     e.stopPropagation();
@@ -6775,9 +7013,10 @@ function maybeRunBots(){
 }
 
 function updateSettings(){
-  app.totalSeats=Math.max(2,Math.min(5,app.totalSeats));
-  app.botCount=Math.max(0,Math.min(app.totalSeats-1,app.botCount));
-  renderLobby();if(!app.localMode&&isHost())send("humanity-room-settings",{totalSeats:app.totalSeats,botCount:app.botCount,scenario:app.scenario});
+  const connected=Math.max(1,app.humans.length);
+  app.totalSeats=Math.max(Math.max(2,connected),Math.min(5,app.totalSeats));
+  app.botCount=Math.max(0,app.totalSeats-connected);
+  renderLobby();if(!app.localMode&&isHost())send("humanity-room-settings",{totalSeats:app.totalSeats,scenario:app.scenario});
 }
 function copyText(text){
   navigator.clipboard?.writeText(text).then(()=>toast("Copied")).catch(()=>toast("Copy unavailable"));
@@ -6797,9 +7036,7 @@ $("modalShade").onclick=closeModals;document.querySelectorAll(".modal-close").fo
 $("stayInGameButton").onclick=closeModals;$("confirmLeaveButton").onclick=()=>disconnectRoom(true);
 $("collectionClose").onclick=()=>closeCollection(false);
 $("roomCodeDisplay").onclick=()=>copyText(app.roomCode);
-$("copyInviteButton").onclick=()=>copyText(location.href.split("#")[0]+"#"+app.roomCode);
 $("seatMinus").onclick=()=>{app.totalSeats--;updateSettings()};$("seatPlus").onclick=()=>{app.totalSeats++;updateSettings()};
-$("botMinus").onclick=()=>{app.botCount--;updateSettings()};$("botPlus").onclick=()=>{app.botCount++;updateSettings()};
 $("scenarioSelect").onchange=()=>{app.scenario=Math.max(1,Math.min(3,Number($("scenarioSelect").value)||1));updateSettings()};
 $("startGameButton").onclick=startHostedGame;
 window.addEventListener("popstate",()=>{
